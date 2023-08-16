@@ -9,11 +9,18 @@ import binascii
 import datetime
 
 from cattledb.storage.models import TimeSeries, SerializableDict, EventList
-from cattledb.core.helper import (to_ts, daily_timestamps, monthly_timestamps,
-                                  ts_daily_left, ts_daily_right,
-                                  ts_weekly_left, ts_weekly_right,
-                                  ts_monthly_left, ts_monthly_right,
-                                  merge_lists_on_key)
+from cattledb.core.helper import (
+    to_ts,
+    daily_timestamps,
+    monthly_timestamps,
+    ts_daily_left,
+    ts_daily_right,
+    ts_weekly_left,
+    ts_weekly_right,
+    ts_monthly_left,
+    ts_monthly_right,
+    merge_lists_on_key,
+)
 from cattledb.grpcserver.cdb_pb2 import FloatTimeSeries, Dictionary
 
 
@@ -162,58 +169,74 @@ class ModelTest(unittest.TestCase):
     def test_daily_timestamps(self):
         x = list(daily_timestamps(0, 0))
         self.assertEqual(x, [0])
-        x = list(daily_timestamps(0, 24*60*60-1))
+        x = list(daily_timestamps(0, 24 * 60 * 60 - 1))
         self.assertEqual(x, [0])
-        x = list(daily_timestamps(0, 24*60*60))
+        x = list(daily_timestamps(0, 24 * 60 * 60))
         self.assertEqual(x, [0, 86400])
-        x = list(daily_timestamps(0, 24*60*60+23))
+        x = list(daily_timestamps(0, 24 * 60 * 60 + 23))
         self.assertEqual(x, [0, 86400])
-        x = list(daily_timestamps(0, 2*24*60*60-1))
+        x = list(daily_timestamps(0, 2 * 24 * 60 * 60 - 1))
         self.assertEqual(x, [0, 86400])
-        x = list(daily_timestamps(0, 2*24*60*60))
-        self.assertEqual(x, [0, 86400, 2*24*60*60])
+        x = list(daily_timestamps(0, 2 * 24 * 60 * 60))
+        self.assertEqual(x, [0, 86400, 2 * 24 * 60 * 60])
 
     def test_monthly_timestamps(self):
         x = list(monthly_timestamps(0, 0))
         self.assertEqual(x, [0])
-        x = list(monthly_timestamps(0, 31*24*60*60-1))
+        x = list(monthly_timestamps(0, 31 * 24 * 60 * 60 - 1))
         self.assertEqual(x, [0])
-        x = list(monthly_timestamps(0, 31*24*60*60))
-        self.assertEqual(x, [0, 31*24*60*60])
-        x = list(monthly_timestamps(0, (31+27)*24*60*60))
-        self.assertEqual(x, [0, 31*24*60*60])
-        x = list(monthly_timestamps(0, (31+28)*24*60*60-1))
-        self.assertEqual(x, [0, 31*24*60*60])
-        x = list(monthly_timestamps(0, (31+28)*24*60*60))
-        self.assertEqual(x, [0, 31*24*60*60, (31+28)*24*60*60])
-        x = list(monthly_timestamps(0, (31+28+30)*24*60*60))
-        self.assertEqual(x, [0, 31*24*60*60, (31+28)*24*60*60])
-        x = list(monthly_timestamps(0, (31+28+31)*24*60*60))
-        self.assertEqual(x, [0, 31*24*60*60, (31+28)*24*60*60, (31+28+31)*24*60*60])
+        x = list(monthly_timestamps(0, 31 * 24 * 60 * 60))
+        self.assertEqual(x, [0, 31 * 24 * 60 * 60])
+        x = list(monthly_timestamps(0, (31 + 27) * 24 * 60 * 60))
+        self.assertEqual(x, [0, 31 * 24 * 60 * 60])
+        x = list(monthly_timestamps(0, (31 + 28) * 24 * 60 * 60 - 1))
+        self.assertEqual(x, [0, 31 * 24 * 60 * 60])
+        x = list(monthly_timestamps(0, (31 + 28) * 24 * 60 * 60))
+        self.assertEqual(x, [0, 31 * 24 * 60 * 60, (31 + 28) * 24 * 60 * 60])
+        x = list(monthly_timestamps(0, (31 + 28 + 30) * 24 * 60 * 60))
+        self.assertEqual(x, [0, 31 * 24 * 60 * 60, (31 + 28) * 24 * 60 * 60])
+        x = list(monthly_timestamps(0, (31 + 28 + 31) * 24 * 60 * 60))
+        self.assertEqual(
+            x,
+            [
+                0,
+                31 * 24 * 60 * 60,
+                (31 + 28) * 24 * 60 * 60,
+                (31 + 28 + 31) * 24 * 60 * 60,
+            ],
+        )
 
     def test_left_right(self):
-        test_dts = [pendulum.datetime(2000, 1, 15, 12, 1),
-                    pendulum.datetime(2000, 3, 21, 14, 45),
-                    pendulum.datetime(2000, 2, 29, 12, 1),
-                    pendulum.datetime(2001, 2, 28, 12, 1),
-                    pendulum.datetime(2014, 11, 21, 14, 45),
-                    pendulum.datetime(2000, 10, 1, 12, 1),
-                    pendulum.datetime(2000, 3, 1, 14, 45),
-                    pendulum.datetime(2000, 8, 30, 12, 1),
-                    pendulum.datetime(2000, 7, 31, 14, 45)]
+        test_dts = [
+            pendulum.datetime(2000, 1, 15, 12, 1),
+            pendulum.datetime(2000, 3, 21, 14, 45),
+            pendulum.datetime(2000, 2, 29, 12, 1),
+            pendulum.datetime(2001, 2, 28, 12, 1),
+            pendulum.datetime(2014, 11, 21, 14, 45),
+            pendulum.datetime(2000, 10, 1, 12, 1),
+            pendulum.datetime(2000, 3, 1, 14, 45),
+            pendulum.datetime(2000, 8, 30, 12, 1),
+            pendulum.datetime(2000, 7, 31, 14, 45),
+        ]
         for dt in test_dts:
-            self.assertEqual(ts_daily_left(dt.int_timestamp),
-                            dt.start_of("day").int_timestamp)
-            self.assertEqual(ts_daily_right(dt.int_timestamp),
-                            dt.end_of("day").int_timestamp)
-            self.assertEqual(ts_weekly_left(dt.int_timestamp),
-                            dt.start_of("week").int_timestamp)
-            self.assertEqual(ts_weekly_right(dt.int_timestamp),
-                            dt.end_of("week").int_timestamp)
-            self.assertEqual(ts_monthly_left(dt.int_timestamp),
-                            dt.start_of("month").int_timestamp)
-            self.assertEqual(ts_monthly_right(dt.int_timestamp),
-                            dt.end_of("month").int_timestamp)
+            self.assertEqual(
+                ts_daily_left(dt.int_timestamp), dt.start_of("day").int_timestamp
+            )
+            self.assertEqual(
+                ts_daily_right(dt.int_timestamp), dt.end_of("day").int_timestamp
+            )
+            self.assertEqual(
+                ts_weekly_left(dt.int_timestamp), dt.start_of("week").int_timestamp
+            )
+            self.assertEqual(
+                ts_weekly_right(dt.int_timestamp), dt.end_of("week").int_timestamp
+            )
+            self.assertEqual(
+                ts_monthly_left(dt.int_timestamp), dt.start_of("month").int_timestamp
+            )
+            self.assertEqual(
+                ts_monthly_right(dt.int_timestamp), dt.end_of("month").int_timestamp
+            )
 
     def test_proto(self):
         res = TimeSeries("ddd", "ph")
@@ -235,8 +258,8 @@ class ModelTest(unittest.TestCase):
         self.assertEqual(len(ts3), 500)
 
     def test_dict(self):
-        d1 = SerializableDict({"hello": "wörld", "föö":"bär"})
-        d2 = SerializableDict({"1": 1, 2:3.4})
+        d1 = SerializableDict({"hello": "wörld", "föö": "bär"})
+        d2 = SerializableDict({"1": 1, 2: 3.4})
 
         self.assertEqual(d1["hello"], "wörld")
         self.assertEqual(d2["1"], 1)
@@ -255,11 +278,11 @@ class ModelTest(unittest.TestCase):
         ts2 = TimeSeries("fff", "temp")
 
         # daily, timeshift to winter
-        start = pendulum.datetime(2018, 10, 25, 0, 0, tz='Europe/Vienna')
+        start = pendulum.datetime(2018, 10, 25, 0, 0, tz="Europe/Vienna")
         cur = start
         for i in range(10):
             for j in range(24 * 6):
-                ts1.insert_point(cur, float(i+1))
+                ts1.insert_point(cur, float(i + 1))
                 cur = cur.add(minutes=10)
         end = cur
         self.assertEqual(start.add(days=10).subtract(hours=1), end)
@@ -289,11 +312,11 @@ class ModelTest(unittest.TestCase):
         self.assertEqual(l[-1].value, 10.0)
 
         # daily, timeshift to summer
-        start = pendulum.datetime(2018, 3, 20, 0, 0, tz='Europe/Vienna')
+        start = pendulum.datetime(2018, 3, 20, 0, 0, tz="Europe/Vienna")
         cur = start
         for i in range(10):
             for j in range(24 * 6):
-                ts2.insert_point(cur, float(i+1))
+                ts2.insert_point(cur, float(i + 1))
                 cur = cur.add(minutes=10)
         end = cur
         self.assertEqual(start.add(days=10).add(hours=1), end)
@@ -332,4 +355,6 @@ class ModelTest(unittest.TestCase):
 
         m2 = merge_lists_on_key(a, b, key=lambda x: x.value)
         self.assertEqual(len(m2), 5)
-        self.assertEqual([x.value for x in m2], ["ph1", "temp1", "act1", "act2", "hum1"])
+        self.assertEqual(
+            [x.value for x in m2], ["ph1", "temp1", "act1", "act2", "hum1"]
+        )

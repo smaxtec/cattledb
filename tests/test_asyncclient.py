@@ -38,7 +38,9 @@ class AsyncTest(unittest.TestCase):
 
         loop = asyncio.get_event_loop()
 
-        res = loop.run_until_complete(client.put_metadata("object", "id1", "note2", {"föö": "bää"}))
+        res = loop.run_until_complete(
+            client.put_metadata("object", "id1", "note2", {"föö": "bää"})
+        )
         self.assertEqual(res, 1)
 
         res = loop.run_until_complete(client.get_metadata("object", "id1", ["note2"]))

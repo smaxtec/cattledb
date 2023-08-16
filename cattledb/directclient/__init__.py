@@ -23,8 +23,12 @@ def create_client(config):
 
     setup_logging(config)
 
-    return CDBClient(engine=engine, engine_options=engine_options, read_only=read_only,
-                     table_prefix=table_prefix)
+    return CDBClient(
+        engine=engine,
+        engine_options=engine_options,
+        read_only=read_only,
+        table_prefix=table_prefix,
+    )
 
 
 def create_async_client(config):
@@ -37,8 +41,13 @@ def create_async_client(config):
 
     setup_logging(config)
 
-    return CDBClient(engine=engine, engine_options=engine_options, read_only=read_only,
-                     table_prefix=table_prefix, pool_size=pool_size)
+    return CDBClient(
+        engine=engine,
+        engine_options=engine_options,
+        read_only=read_only,
+        table_prefix=table_prefix,
+        pool_size=pool_size,
+    )
 
 
 def to_pendulum(dt, allow_int=True):
@@ -55,19 +64,37 @@ def to_pendulum(dt, allow_int=True):
 class CDBClient(object):
     _enforce_read_only = False
 
-    def __init__(self, engine, engine_options, table_prefix="cdb",
-                 read_only=True, admin=False, _config=None):
+    def __init__(
+        self,
+        engine,
+        engine_options,
+        table_prefix="cdb",
+        read_only=True,
+        admin=False,
+        _config=None,
+    ):
         if CDBClient._enforce_read_only and not read_only:
             raise RuntimeError("Direct CDBClient only allowed for read_only access")
         self.read_only = read_only
-        self.db = Connection(engine=engine, engine_options=engine_options, read_only=read_only,
-                             table_prefix=table_prefix, admin=admin, _config=_config)
-
+        self.db = Connection(
+            engine=engine,
+            engine_options=engine_options,
+            read_only=read_only,
+            table_prefix=table_prefix,
+            admin=admin,
+            _config=_config,
+        )
 
     @classmethod
     def from_config(cls, config):
-        return cls(engine=config.ENGINE, engine_options=config.ENGINE_OPTIONS, table_prefix=config.TABLE_PREFIX,
-                   read_only=config.READ_ONLY, admin=config.ADMIN, _config=config)
+        return cls(
+            engine=config.ENGINE,
+            engine_options=config.ENGINE_OPTIONS,
+            table_prefix=config.TABLE_PREFIX,
+            read_only=config.READ_ONLY,
+            admin=config.ADMIN,
+            _config=config,
+        )
 
     def raise_on_read_only(self):
         if self.read_only:
@@ -172,7 +199,9 @@ class CDBClient(object):
         return self.db.metadata.put_metadata_items([md], internal=internal)
 
     def get_metadata(self, object_name, object_key, namespaces=None, internal=False):
-        return self.db.metadata.get_metadata(object_name, object_key, keys=namespaces, internal=internal)
+        return self.db.metadata.get_metadata(
+            object_name, object_key, keys=namespaces, internal=internal
+        )
 
     # --------------------------------------------------------------------------
     # Activity
@@ -181,8 +210,9 @@ class CDBClient(object):
     def incr_activity(self, reader_id, device_id, timestamp, parent_ids=None, value=1):
         self.raise_on_read_only()
         ts = to_pendulum(timestamp, allow_int=True).int_timestamp
-        return self.db.activity.incr_activity(reader_id, device_id,
-                                              timestamp=ts, parent_ids=parent_ids, value=value)
+        return self.db.activity.incr_activity(
+            reader_id, device_id, timestamp=ts, parent_ids=parent_ids, value=value
+        )
 
     def get_total_activity(self, day):
         day_ts = to_pendulum(day, allow_int=True).int_timestamp
@@ -203,6 +233,7 @@ class AsyncCDBClient(object):
         self.pool_size = pool_size
         import asyncio
         from concurrent.futures import ThreadPoolExecutor
+
         if loop is None:
             self.loop = asyncio.get_event_loop()
         else:
@@ -212,8 +243,16 @@ class AsyncCDBClient(object):
 
     @classmethod
     def from_config(cls, config, loop=None):
-        return cls(engine=config.ENGINE, engine_options=config.ENGINE_OPTIONS, table_prefix=config.TABLE_PREFIX,
-                   read_only=config.READ_ONLY, admin=config.ADMIN, pool_size=config.POOL_SIZE, loop=loop, _config=config)
+        return cls(
+            engine=config.ENGINE,
+            engine_options=config.ENGINE_OPTIONS,
+            table_prefix=config.TABLE_PREFIX,
+            read_only=config.READ_ONLY,
+            admin=config.ADMIN,
+            pool_size=config.POOL_SIZE,
+            loop=loop,
+            _config=config,
+        )
 
     def info(self):
         return self._client.info()

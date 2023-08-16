@@ -31,7 +31,11 @@ class SQLiteEngine(StorageEngine):
 
     def connect(self):
         if self.db_connection is None:
-            f = ":memory:" if self.in_memory else os.path.join(self.data_dir, "cattle.db")
+            f = (
+                ":memory:"
+                if self.in_memory
+                else os.path.join(self.data_dir, "cattle.db")
+            )
             self.db_connection = sqlite3.connect(f, uri=self.read_only)
         return self.db_connection
 
@@ -51,12 +55,16 @@ class SQLiteEngine(StorageEngine):
             k TEXT PRIMARY KEY,
             row_meta TEXT
         )
-        """.format(full_table_name)
+        """.format(
+            full_table_name
+        )
         try:
             con.execute(_SQL)
         except OperationalError as e:
             if silent:
-                logger.warning("CREATE: TABLE {} ALREADY EXISTING".format(full_table_name))
+                logger.warning(
+                    "CREATE: TABLE {} ALREADY EXISTING".format(full_table_name)
+                )
                 logger.warning(e)
             else:
                 raise
@@ -71,12 +79,16 @@ class SQLiteEngine(StorageEngine):
         full_table_name = self.get_full_table_name(table_name)
         _SQL = """
         ALTER TABLE {} ADD COLUMN {} BLOB
-        """.format(full_table_name, column_family)
+        """.format(
+            full_table_name, column_family
+        )
         try:
             con.execute(_SQL)
         except OperationalError as e:
             if silent:
-                logger.warning("CREATE CF: Ignoring existing family: {}".format(column_family))
+                logger.warning(
+                    "CREATE CF: Ignoring existing family: {}".format(column_family)
+                )
                 logger.warning(e)
             else:
                 raise
@@ -141,17 +153,33 @@ class SQLiteTable(StorageTable):
         for k, v in values.items():
             fam, col = self.split_column(k)
             assert fam == column_family
-            d[col] = base64.b64encode(v).decode('ascii')
+            d[col] = base64.b64encode(v).decode("ascii")
         # Below is the SQLite >3.24 version
         # _SQL = 'INSERT INTO {} (k, {}) VALUES (?, ?) ON CONFLICT(k) DO UPDATE SET {} = ? WHERE k = ?'.format(self.table, fam, fam)
-        _SQL_UPDATE = 'UPDATE {} SET {} = ? WHERE k = ?;'.format(self.table, fam)
-        _SQL_INSERT = 'INSERT INTO {} (k, {}) SELECT ?, ? WHERE (Select Changes() = 0);'.format(self.table, fam)
+        _SQL_UPDATE = "UPDATE {} SET {} = ? WHERE k = ?;".format(self.table, fam)
+        _SQL_INSERT = (
+            "INSERT INTO {} (k, {}) SELECT ?, ? WHERE (Select Changes() = 0);".format(
+                self.table, fam
+            )
+        )
         cur = self.con.cursor()
         raw_value = json.dumps(d)
         # try update
-        cur.execute(_SQL_UPDATE, (raw_value, row_id,))
+        cur.execute(
+            _SQL_UPDATE,
+            (
+                raw_value,
+                row_id,
+            ),
+        )
         # try insert
-        cur.execute(_SQL_INSERT, (row_id, raw_value,))
+        cur.execute(
+            _SQL_INSERT,
+            (
+                row_id,
+                raw_value,
+            ),
+        )
         self.con.commit()
         return cur.lastrowid
 
@@ -200,8 +228,14 @@ class SQLiteTable(StorageTable):
             res.append(self.upsert_row(r.row_key, r.cells))
         return res
 
-    def row_generator(self, row_keys=None, start_key=None, end_key=None,
-                      column_families=None, check_prefix=None):
+    def row_generator(
+        self,
+        row_keys=None,
+        start_key=None,
+        end_key=None,
+        column_families=None,
+        check_prefix=None,
+    ):
         if row_keys is None and start_key is None:
             raise ValueError("use row_keys or start_key parameter")
         if start_key is not None and (end_key is None and check_prefix is None):
@@ -276,7 +310,7 @@ class SQLiteTable(StorageTable):
             if b is None:
                 old_value = 0
             else:
-                old_value = struct.Struct('>q').unpack(b)[0]
+                old_value = struct.Struct(">q").unpack(b)[0]
         except KeyError:
             old_value = 0
 
@@ -284,7 +318,7 @@ class SQLiteTable(StorageTable):
             new_value = old_value + value
         else:
             new_value = 0 + value
-        d = struct.Struct('>q').pack(new_value)
+        d = struct.Struct(">q").pack(new_value)
         self.write_cell(row_id, column, d)
         return new_value
 

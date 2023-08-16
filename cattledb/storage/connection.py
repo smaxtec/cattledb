@@ -19,9 +19,17 @@ logger = logging.getLogger(__name__)
 class Connection(object):
     MAX_THREADS = 1000
 
-    def __init__(self, read_only=False, table_prefix="mycdb", engine_options=None,
-                 metric_definitions=None, event_definitions=None, engine="bigtable",
-                 admin=True, _config=None):
+    def __init__(
+        self,
+        read_only=False,
+        table_prefix="mycdb",
+        engine_options=None,
+        metric_definitions=None,
+        event_definitions=None,
+        engine="bigtable",
+        admin=True,
+        _config=None,
+    ):
         self.read_only = read_only
         self.table_prefix = table_prefix
         self.engine_options = engine_options or {}
@@ -53,25 +61,36 @@ class Connection(object):
 
         # Register Default Data Stores
         from .stores import ConfigStore
+
         self._config_store = ConfigStore(self)
         self.register_store(self._config_store)
         from .stores import TimeSeriesStore
+
         self.timeseries = TimeSeriesStore(self)
         self.register_store(self.timeseries)
         from .stores import ActivityStore
+
         self.activity = ActivityStore(self)
         self.register_store(self.activity)
         from .stores import EventStore
+
         self.events = EventStore(self)
         self.register_store(self.events)
         from .stores import MetaDataStore
+
         self.metadata = MetaDataStore(self)
         self.register_store(self.metadata)
 
     @classmethod
     def from_config(cls, config):
-        return cls(engine=config.ENGINE, engine_options=config.ENGINE_OPTIONS, table_prefix=config.TABLE_PREFIX,
-                   read_only=config.READ_ONLY, admin=config.ADMIN, _config=config)
+        return cls(
+            engine=config.ENGINE,
+            engine_options=config.ENGINE_OPTIONS,
+            table_prefix=config.TABLE_PREFIX,
+            read_only=config.READ_ONLY,
+            admin=config.ADMIN,
+            _config=config,
+        )
 
     def info(self):
         return {
@@ -81,7 +100,7 @@ class Connection(object):
             "engine": self.engine_type,
             "stores": list(self.stores.keys()),
             "engine_pool": list(self.engines.keys()),
-            "engine_pool_size": len(self.engines)
+            "engine_pool_size": len(self.engines),
         }
 
     def register_store(self, store):
@@ -94,7 +113,9 @@ class Connection(object):
             for table_name, columns in table_def.items():
                 eng.setup_table(table_name, silent=silent)
                 for col in columns:
-                    eng.setup_column_family(table_name, column_family=col, silent=silent)
+                    eng.setup_column_family(
+                        table_name, column_family=col, silent=silent
+                    )
 
     def create_all_metrics(self, silent=False):
         eng = self.get_engine()
@@ -113,21 +134,30 @@ class Connection(object):
                 eng.setup_column_family(table_name, column_family=m.id, silent=silent)
                 break
         else:
-            raise KeyError("metric {} not known (add it to settings)".format(metric_name))
+            raise KeyError(
+                "metric {} not known (add it to settings)".format(metric_name)
+            )
 
     def _new_engine(self):
-        return engine_factory(self.engine_type, read_only=self.read_only, table_prefix=self.table_prefix,
-                              admin=self.admin, engine_options=self.engine_options)
+        return engine_factory(
+            self.engine_type,
+            read_only=self.read_only,
+            table_prefix=self.table_prefix,
+            admin=self.admin,
+            engine_options=self.engine_options,
+        )
 
     def get_engine(self):
         # only one engine if no threading
         if not self.threaded_engines:
             if "main" not in self.engines:
                 self.engines["main"] = self._new_engine()
-                logger.warning("New Database Engine created (Thread: {})".format("main"))
+                logger.warning(
+                    "New Database Engine created (Thread: {})".format("main")
+                )
             return self.engines["main"]
         # check if this thread already has an engine
-        engine = getattr(self.thread_local, 'engine', None)
+        engine = getattr(self.thread_local, "engine", None)
         if engine is None:
             # no engine found for this thread
             t = threading.currentThread().getName()
@@ -136,7 +166,9 @@ class Connection(object):
             self.engines[t] = engine
             logger.warning("New Database Engine created (Thread: {})".format(t))
             if len(self.engines) > self.MAX_THREADS:
-                logger.warning("MAX_THREAD sized reached with {} threads".format(len(self.engines)))
+                logger.warning(
+                    "MAX_THREAD sized reached with {} threads".format(len(self.engines))
+                )
                 raise RuntimeError("too many threads")
         return engine
 
@@ -169,7 +201,9 @@ class Connection(object):
                 entry = {
                     "name": table_name,
                     "full_name": eng.get_full_table_name(table_name),
-                    "column_families": eng.get_admin_table(table_name).get_column_families()
+                    "column_families": eng.get_admin_table(
+                        table_name
+                    ).get_column_families(),
                 }
                 all_tables.append(entry)
         return all_tables
@@ -217,12 +251,16 @@ class Connection(object):
     def add_metric_definitions(self, defs):
         for d in defs:
             assert isinstance(d, MetricDefinition)
-        self._metric_definitions = merge_lists_on_key(self._metric_definitions, defs, key=lambda x: x.id)
+        self._metric_definitions = merge_lists_on_key(
+            self._metric_definitions, defs, key=lambda x: x.id
+        )
 
     def add_event_definitions(self, defs):
         for d in defs:
             assert isinstance(d, EventDefinition)
-        self._event_definitions = merge_lists_on_key(self._event_definitions, defs, key=lambda x: x.name)
+        self._event_definitions = merge_lists_on_key(
+            self._event_definitions, defs, key=lambda x: x.name
+        )
 
     def new_metric_definition(self, metric_def):
         self.check_init()
@@ -284,14 +322,18 @@ class Connection(object):
 
     def load_event_definitions(self):
         e_new = self._get_event_definitions()
-        merged = merge_lists_on_key(self._event_definitions, e_new, key=lambda x: x.name)
+        merged = merge_lists_on_key(
+            self._event_definitions, e_new, key=lambda x: x.name
+        )
         self._event_definitions = merged
 
     def restore_configuration(self):
         try:
             database_init = self.read_config("database_init")
         except KeyError:
-            raise RuntimeError("no database configuration. make sure this database is initialized.")
+            raise RuntimeError(
+                "no database configuration. make sure this database is initialized."
+            )
         self.load_event_definitions()
         self.load_metric_definitions()
 

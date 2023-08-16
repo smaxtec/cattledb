@@ -9,8 +9,8 @@ from ..directclient import CDBClient
 
 
 @click.group()
-@click.option('--configfile', '-c', type=click.Path(exists=True))
-@click.option('--configclass', type=str)
+@click.option("--configfile", "-c", type=click.Path(exists=True))
+@click.option("--configclass", type=str)
 @click.pass_context
 def cli(ctx, configfile, configclass):
     """CattleDB Command Line Tool"""

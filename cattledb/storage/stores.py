@@ -12,10 +12,26 @@ from google.cloud import bigtable
 from google.cloud.bigtable.row_filters import CellsColumnLimitFilter
 from google.cloud.bigtable.column_family import MaxVersionsGCRule
 
-from ..core.helper import (from_ts, daily_timestamps, get_metric_name_lookup, get_metric_ids,
-                           get_metric_names, monthly_timestamps, get_event_name_lookup, get_metric_id_lookup)
-from .models import (TimeSeries, EventList, MetaDataItem, SerializableDict,
-                     ReaderActivityItem, DeviceActivityItem, RowUpsert, EventSeriesType)
+from ..core.helper import (
+    from_ts,
+    daily_timestamps,
+    get_metric_name_lookup,
+    get_metric_ids,
+    get_metric_names,
+    monthly_timestamps,
+    get_event_name_lookup,
+    get_metric_id_lookup,
+)
+from .models import (
+    TimeSeries,
+    EventList,
+    MetaDataItem,
+    SerializableDict,
+    ReaderActivityItem,
+    DeviceActivityItem,
+    RowUpsert,
+    EventSeriesType,
+)
 from ..grpcserver.cdb_pb2 import FloatTimeSeries, FloatTimeSeriesList
 
 
@@ -49,7 +65,9 @@ class MetaDataStore(object):
         # check data
         for i in items:
             if not isinstance(i.data, dict):
-                raise ValueError("Item {}.{}.{} is no dict".format(i.object_name, i.object_id, i.key))
+                raise ValueError(
+                    "Item {}.{}.{} is no dict".format(i.object_name, i.object_id, i.key)
+                )
 
         column = "i:" if internal else "p:"
 
@@ -68,18 +86,28 @@ class MetaDataStore(object):
 
         timer = time.time() - timer
         # emit signal
-        signal_payload = {"count": len(items), "row_keys": row_keys, "timer": timer, "method": "PUT"}
-        sig = signal('metadata.put')
+        signal_payload = {
+            "count": len(items),
+            "row_keys": row_keys,
+            "timer": timer,
+            "method": "PUT",
+        }
+        sig = signal("metadata.put")
         sig.send(self, info=signal_payload)
-        logger.debug("PUT META: {} inserts in {}".format(len(items), timer), extra=signal_payload)
+        logger.debug(
+            "PUT META: {} inserts in {}".format(len(items), timer), extra=signal_payload
+        )
         return len(items)
 
     def put_metadata(self, object_name, object_id, key, data, internal=False):
-        return self.put_metadata_items([MetaDataItem(object_name, object_id, key, data)],
-                                       internal=internal)
+        return self.put_metadata_items(
+            [MetaDataItem(object_name, object_id, key, data)], internal=internal
+        )
 
     def get_metadata(self, object_name, object_id, keys=None, internal=False):
-        r = self.get_metadata_bulk(object_name, [object_id], keys=keys, internal=internal)
+        r = self.get_metadata_bulk(
+            object_name, [object_id], keys=keys, internal=internal
+        )
         if len(r) > 0:
             return r
         return None
@@ -108,10 +136,18 @@ class MetaDataStore(object):
 
         timer = time.time() - timer
         # emit signal
-        signal_payload = {"count": len(row_keys), "row_keys": row_keys, "timer": timer, "method": "GET"}
-        sig = signal('metadata.get')
+        signal_payload = {
+            "count": len(row_keys),
+            "row_keys": row_keys,
+            "timer": timer,
+            "method": "GET",
+        }
+        sig = signal("metadata.get")
         sig.send(self, info=signal_payload)
-        logger.debug("GET METADATA: {} rows in {}".format(len(row_keys), timer), extra=signal_payload)
+        logger.debug(
+            "GET METADATA: {} rows in {}".format(len(row_keys), timer),
+            extra=signal_payload,
+        )
         return metadata
 
 
@@ -158,7 +194,7 @@ class ActivityStore(object):
     TABLENAME = "activity"
     TABLEOPTIONS = {}
     STOREID = "activity"
-    MAX_GET_SIZE = 90*24*60*60
+    MAX_GET_SIZE = 90 * 24 * 60 * 60
     # row: org/bs/total#reversets#reader colfam: seen:, data: hourminute_device, (device1, device2, rssi, readout_ts?)
 
     def __init__(self, connection_object):
@@ -177,14 +213,14 @@ class ActivityStore(object):
         y = 5000 - int(time_tuple.tm_year)
         m = 50 - int(time_tuple.tm_mon)
         d = 50 - int(time_tuple.tm_mday)
-        return "{:04d}{:02d}{:02d}".format(y,m,d)
+        return "{:04d}{:02d}{:02d}".format(y, m, d)
 
     @classmethod
     def reverse_day_key_to_day(cls, reverse_key):
         y = 5000 - int(reverse_key[0:4])
         m = 50 - int(reverse_key[4:6])
         d = 50 - int(reverse_key[6:8])
-        return "{:04d}{:02d}{:02d}".format(y,m,d)
+        return "{:04d}{:02d}{:02d}".format(y, m, d)
 
     @classmethod
     def get_hour_key(cls, ts):
@@ -216,8 +252,14 @@ class ActivityStore(object):
         if self.connection_object.read_only:
             raise RuntimeError("Cannot execute incr_activity in readonly mode")
 
-        act_limit = bool((time.time() - 30*365*24*60*60) < timestamp < (time.time() + 3*24*60*60))
-        self.connection_object.assert_limits(act_limit, "timestamp out of activity window -30y +30d")
+        act_limit = bool(
+            (time.time() - 30 * 365 * 24 * 60 * 60)
+            < timestamp
+            < (time.time() + 3 * 24 * 60 * 60)
+        )
+        self.connection_object.assert_limits(
+            act_limit, "timestamp out of activity window -30y +30d"
+        )
 
         row_keys = self.get_insert_keys(reader_id, timestamp, parent_ids)
         column = "c:{}.{}".format(self.get_hour_key(timestamp), device_id)
@@ -230,10 +272,18 @@ class ActivityStore(object):
 
         timer = time.time() - timer
         # emit signal
-        signal_payload = {"count": len(row_keys), "row_keys": row_keys, "timer": timer, "method": "PUT"}
-        sig = signal('activity.incr')
+        signal_payload = {
+            "count": len(row_keys),
+            "row_keys": row_keys,
+            "timer": timer,
+            "method": "PUT",
+        }
+        sig = signal("activity.incr")
         sig.send(self, info=signal_payload)
-        logger.debug("INCR ACTIVITY: {}, {} incrs in {}".format(device_id, len(res), timer), extra=signal_payload)
+        logger.debug(
+            "INCR ACTIVITY: {}, {} incrs in {}".format(device_id, len(res), timer),
+            extra=signal_payload,
+        )
         # print("INCR ACTIVITY: {}, {} incrs in {}".format(device_id, len(res), timer))
         return res
 
@@ -246,15 +296,14 @@ class ActivityStore(object):
         act_limit = bool(to_ts - from_ts < self.MAX_GET_SIZE)
         self.connection_object.assert_limits(act_limit, "activity timerange to large")
 
-        daily_ts =  daily_timestamps(from_ts, to_ts)
+        daily_ts = daily_timestamps(from_ts, to_ts)
         row_keys = [self.get_row_key("t", ts, reader_id=reader_id) for ts in daily_ts]
         columns = ["c"]
 
         timer = time.time()
 
         activitys = defaultdict(lambda: defaultdict(int))
-        rowgen = self.table().row_generator(row_keys=row_keys,
-                                            column_families=columns)
+        rowgen = self.table().row_generator(row_keys=row_keys, column_families=columns)
 
         for row_key, data_dict in rowgen:
             day = self.reverse_day_key_to_day(row_key.split("#")[-2])
@@ -268,15 +317,23 @@ class ActivityStore(object):
                     continue
                 day_hour = "{}{}".format(day, p[0])
                 # parse value
-                int_value, = struct.Struct('>q').unpack(value)
+                (int_value,) = struct.Struct(">q").unpack(value)
                 activitys[day_hour][p[1]] += int_value
 
         timer = time.time() - timer
         # emit signal
-        signal_payload = {"count": len(row_keys), "row_keys": row_keys, "timer": timer, "method": "GET"}
-        sig = signal('activity.get')
+        signal_payload = {
+            "count": len(row_keys),
+            "row_keys": row_keys,
+            "timer": timer,
+            "method": "GET",
+        }
+        sig = signal("activity.get")
         sig.send(self, info=signal_payload)
-        logger.debug("GET ACTIVITY: {} rows in {}".format(len(row_keys), timer), extra=signal_payload)
+        logger.debug(
+            "GET ACTIVITY: {} rows in {}".format(len(row_keys), timer),
+            extra=signal_payload,
+        )
         # print("GET ACTIVITY: {} rows in {}".format(len(row_keys), timer))
         out = []
         for day_hour in sorted(activitys.keys()):
@@ -297,8 +354,11 @@ class ActivityStore(object):
         row_keys = []
 
         # Start scanning
-        row_gen = self.table().row_generator(start_key=row_start_search, column_families=columns,
-                                             check_prefix=row_start_search)
+        row_gen = self.table().row_generator(
+            start_key=row_start_search,
+            column_families=columns,
+            check_prefix=row_start_search,
+        )
 
         for row_key, data_dict in row_gen:
             readout_id = row_key.split("#")[-1]
@@ -317,10 +377,17 @@ class ActivityStore(object):
 
         timer = time.time() - timer
         # emit signal
-        signal_payload = {"count": len(row_keys), "row_keys": row_keys, "timer": timer, "method": "SCAN"}
-        sig = signal('activity.get')
+        signal_payload = {
+            "count": len(row_keys),
+            "row_keys": row_keys,
+            "timer": timer,
+            "method": "SCAN",
+        }
+        sig = signal("activity.get")
         sig.send(self, info=signal_payload)
-        logger.debug("SCAN ACTIVITY: {} rows in {}".format(1, timer), extra=signal_payload)
+        logger.debug(
+            "SCAN ACTIVITY: {} rows in {}".format(1, timer), extra=signal_payload
+        )
         # print("SCAN ACTIVITY: {} rows in {}".format(1, timer))
         out = []
         for day_hour in sorted(activitys.keys()):
@@ -373,7 +440,7 @@ class TimeSeriesStore(object):
         y = 5000 - int(time_tuple.tm_year)
         m = 50 - int(time_tuple.tm_mon)
         d = 50 - int(time_tuple.tm_mday)
-        return "{:04d}{:02d}{:02d}".format(y,m,d)
+        return "{:04d}{:02d}{:02d}".format(y, m, d)
 
     @classmethod
     def get_row_key(cls, base_key, day_ts):
@@ -388,7 +455,9 @@ class TimeSeriesStore(object):
 
     def insert_timeseries(self, ts):
         if self.connection_object.read_only:
-            raise RuntimeError("Cannot execute insert_timeseries command in readonly mode")
+            raise RuntimeError(
+                "Cannot execute insert_timeseries command in readonly mode"
+            )
 
         assert bool(ts)
         metric_object = self.get_metric_object(ts.metric)
@@ -412,10 +481,20 @@ class TimeSeriesStore(object):
 
         timer = time.time() - timer
         # emit signal
-        signal_payload = {"count": len(row_keys), "row_keys": row_keys, "timer": timer, "method": "PUT"}
-        sig = signal('timeseries.put')
+        signal_payload = {
+            "count": len(row_keys),
+            "row_keys": row_keys,
+            "timer": timer,
+            "method": "PUT",
+        }
+        sig = signal("timeseries.put")
         sig.send(self, info=signal_payload)
-        logger.debug("INSERT: {}.{}, {} points in {}".format(key, metric_object.name, len(ts), timer), extra=signal_payload)
+        logger.debug(
+            "INSERT: {}.{}, {} points in {}".format(
+                key, metric_object.name, len(ts), timer
+            ),
+            extra=signal_payload,
+        )
         # print("INSERT: {}.{}, {} points in {}".format(key, metric, len(ts), timer))
         return len(ts)
 
@@ -442,15 +521,19 @@ class TimeSeriesStore(object):
 
         metric_objects = [self.get_metric_object(m) for m in metrics]
 
-        row_keys = [self.get_row_key(key, ts) for ts in daily_timestamps(from_ts, to_ts)]
+        row_keys = [
+            self.get_row_key(key, ts) for ts in daily_timestamps(from_ts, to_ts)
+        ]
         first_key = self.get_row_key(key, to_ts)
         last_key = self.get_row_key(key, from_ts)
         columns = ["{}".format(m.id) for m in metric_objects]
 
         timeseries = {m.id: TimeSeries(key, m.name) for m in metric_objects}
-        #res = self.table().read_rows(row_keys=row_keys, column_families=columns)
-        #gen = self.table().row_generator(row_keys=row_keys, column_families=columns)
-        gen = self.table().row_generator(start_key=first_key, end_key=last_key, column_families=columns)
+        # res = self.table().read_rows(row_keys=row_keys, column_families=columns)
+        # gen = self.table().row_generator(row_keys=row_keys, column_families=columns)
+        gen = self.table().row_generator(
+            start_key=first_key, end_key=last_key, column_families=columns
+        )
 
         for row_key, data_dict in gen:
             for k in reversed(data_dict):
@@ -472,10 +555,18 @@ class TimeSeriesStore(object):
 
         timer = time.time() - timer
         # emit signal
-        signal_payload = {"count": len(row_keys), "row_keys": row_keys, "timer": timer, "method": "GET"}
-        sig = signal('timeseries.get')
+        signal_payload = {
+            "count": len(row_keys),
+            "row_keys": row_keys,
+            "timer": timer,
+            "method": "GET",
+        }
+        sig = signal("timeseries.get")
         sig.send(self, info=signal_payload)
-        logger.debug("GET: {}.{}, {} points in {}".format(key, metrics, size, timer), extra=signal_payload)
+        logger.debug(
+            "GET: {}.{}, {} points in {}".format(key, metrics, size, timer),
+            extra=signal_payload,
+        )
         # print("GET: {}.{}, {} points in {}".format(key, metrics, size, timer))
         return out
 
@@ -504,7 +595,9 @@ class TimeSeriesStore(object):
 
         series = TimeSeries(key, metric_object.name)
         # Start scanning
-        row = self.table().get_first_row(start_search_row, column_families=columns, end_key=end_search_row)
+        row = self.table().get_first_row(
+            start_search_row, column_families=columns, end_key=end_search_row
+        )
         if row is not None:
             row_key, data_dict = row
             row_keys.append(row_key)
@@ -516,7 +609,9 @@ class TimeSeriesStore(object):
                     continue
                 m = s[0]
                 if m != metric_object.id:
-                    raise ValueError("wrong metric in database {} != {}".format(m, metric_object.id))
+                    raise ValueError(
+                        "wrong metric in database {} != {}".format(m, metric_object.id)
+                    )
                 ts = int(s[1])
                 series.insert_storage_item(ts, value)
 
@@ -524,10 +619,18 @@ class TimeSeriesStore(object):
 
         timer = time.time() - timer
         # emit signal
-        signal_payload = {"count": len(row_keys), "row_keys": row_keys, "timer": timer, "method": "SCAN"}
-        sig = signal('timeseries.last')
+        signal_payload = {
+            "count": len(row_keys),
+            "row_keys": row_keys,
+            "timer": timer,
+            "method": "SCAN",
+        }
+        sig = signal("timeseries.last")
         sig.send(self, info=signal_payload)
-        logger.debug("SCAN: {}.{}, {} points in {}".format(key, metric, 1, timer), extra=signal_payload)
+        logger.debug(
+            "SCAN: {}.{}, {} points in {}".format(key, metric, 1, timer),
+            extra=signal_payload,
+        )
         # print("SCAN: {}.{}, {} points in {}".format(key, metric, 1, timer))
         return series
 
@@ -552,9 +655,9 @@ class TimeSeriesStore(object):
         row_keys = []
 
         # Start scanning
-        row_gen = self.table().row_generator(start_key=start_search_row, end_key=end_search_row,
-                                             column_families=None)
-        
+        row_gen = self.table().row_generator(
+            start_key=start_search_row, end_key=end_search_row, column_families=None
+        )
 
         timeseries = defaultdict(lambda: TimeSeries(key, "_unknown"))
         for row_key, data_dict in row_gen:
@@ -588,9 +691,11 @@ class TimeSeriesStore(object):
         timer = time.time() - timer
         # emit signal
         signal_payload = {"count": len(row_keys), "timer": timer, "method": "GET"}
-        sig = signal('timeseries.full')
+        sig = signal("timeseries.full")
         sig.send(self, info=signal_payload)
-        logger.debug("FULL: {}, {} points in {}".format(key, size, timer), extra=signal_payload)
+        logger.debug(
+            "FULL: {}, {} points in {}".format(key, size, timer), extra=signal_payload
+        )
         return list(timeseries.values())
 
     def get_last_values(self, key, metrics):
@@ -598,14 +703,18 @@ class TimeSeriesStore(object):
 
     def delete_timeseries(self, key, metrics, from_ts, to_ts):
         if self.connection_object.read_only:
-            raise RuntimeError("Cannot execute delete_timeseries command in readonly mode")
+            raise RuntimeError(
+                "Cannot execute delete_timeseries command in readonly mode"
+            )
 
         assert from_ts <= to_ts
         assert len(metrics) > 0
         assert len(metrics[0]) > 1
         timer = time.time()
 
-        row_keys = [self.get_row_key(key, ts) for ts in daily_timestamps(from_ts, to_ts)]
+        row_keys = [
+            self.get_row_key(key, ts) for ts in daily_timestamps(from_ts, to_ts)
+        ]
         metric_objects = [self.get_metric_object(m) for m in metrics]
         # Check for delete flag
         columns = []
@@ -621,12 +730,21 @@ class TimeSeriesStore(object):
         timer = time.time() - timer
         count = len(row_keys)
         # emit signal
-        signal_payload = {"count": len(row_keys), "row_keys": row_keys, "timer": timer, "method": "DELETE"}
-        sig = signal('timeseries.delete')
+        signal_payload = {
+            "count": len(row_keys),
+            "row_keys": row_keys,
+            "timer": timer,
+            "method": "DELETE",
+        }
+        sig = signal("timeseries.delete")
         sig.send(self, info=signal_payload)
-        logger.debug("DELETE: {}.{}, {} days in {}".format(key, metrics, count, timer), extra=signal_payload)
+        logger.debug(
+            "DELETE: {}.{}, {} days in {}".format(key, metrics, count, timer),
+            extra=signal_payload,
+        )
         # print("DELETE: {}.{}, {} days in {}".format(key, metrics, count, timer))
         return count
+
 
 class EventStore(object):
     """
@@ -637,6 +755,7 @@ class EventStore(object):
     For daily rows one event every second is possible.
     For monthly rows one event every minute is possible.
     """
+
     TABLENAME = "events"
     TABLEOPTIONS = {}
     STOREID = "events"
@@ -660,8 +779,9 @@ class EventStore(object):
 
     def get_type_for_name(self, name):
         for ev_def in self.EVENTS:
-            if ((ev_def.name[-1] == "*" and name.startswith(ev_def.name[:-1]))
-                or ev_def.name == name):
+            if (
+                ev_def.name[-1] == "*" and name.startswith(ev_def.name[:-1])
+            ) or ev_def.name == name:
                 return EventSeriesType(ev_def.type.value)
         return self.DEFAULT_SERIES_TYPE
 
@@ -685,7 +805,9 @@ class EventStore(object):
         if t == EventSeriesType.DAILY:
             row_key = "{}#{}#{}".format(base_key, name, self.reverse_day_key(day_ts))
         elif t == EventSeriesType.MONTHLY:
-            row_key = "{}#m_{}#{}".format(base_key, name, self.reverse_month_key(day_ts))
+            row_key = "{}#m_{}#{}".format(
+                base_key, name, self.reverse_month_key(day_ts)
+            )
         else:
             raise ValueError("invalid EventSeriesType")
         return row_key
@@ -702,7 +824,9 @@ class EventStore(object):
 
     def insert_events(self, event_list):
         if self.connection_object.read_only:
-            raise RuntimeError("Cannot execute insert_eventlist command in readonly mode")
+            raise RuntimeError(
+                "Cannot execute insert_eventlist command in readonly mode"
+            )
 
         assert bool(event_list)
         name = event_list.metric
@@ -735,10 +859,20 @@ class EventStore(object):
 
         timer = time.time() - timer
         # emit signal
-        signal_payload = {"count": len(row_keys), "row_keys": row_keys, "timer": timer, "method": "PUT"}
-        sig = signal('event.put')
+        signal_payload = {
+            "count": len(row_keys),
+            "row_keys": row_keys,
+            "timer": timer,
+            "method": "PUT",
+        }
+        sig = signal("event.put")
         sig.send(self, info=signal_payload)
-        logger.debug("INSERT EVENTS: {}.{}, {} points in {}".format(key, name, len(event_list), timer), extra=signal_payload)
+        logger.debug(
+            "INSERT EVENTS: {}.{}, {} points in {}".format(
+                key, name, len(event_list), timer
+            ),
+            extra=signal_payload,
+        )
         # print("INSERT EVENTS: {}.{}, {} points in {}".format(key, name, len(event_list), timer))
         return len(event_list)
 
@@ -772,7 +906,7 @@ class EventStore(object):
         row_keys = [self.get_row_key(key, name, ts) for ts in it]
         columns = ["e"]
 
-        #res = self.table().read_rows(row_keys=row_keys, column_families=columns)
+        # res = self.table().read_rows(row_keys=row_keys, column_families=columns)
         gen = self.table().row_generator(row_keys=row_keys, column_families=columns)
 
         events = EventList(key, name)
@@ -789,10 +923,18 @@ class EventStore(object):
 
         timer = time.time() - timer
         # emit signal
-        signal_payload = {"count": len(row_keys), "row_keys": row_keys, "timer": timer, "method": "GET"}
-        sig = signal('event.get')
+        signal_payload = {
+            "count": len(row_keys),
+            "row_keys": row_keys,
+            "timer": timer,
+            "method": "GET",
+        }
+        sig = signal("event.get")
         sig.send(self, info=signal_payload)
-        logger.debug("GET EVENTS: {}.{}, {} points in {}".format(key, name, len(events), timer), extra=signal_payload)
+        logger.debug(
+            "GET EVENTS: {}.{}, {} points in {}".format(key, name, len(events), timer),
+            extra=signal_payload,
+        )
         # print("GET EVENTS: {}.{}, {} points in {}".format(key, name, len(events), timer))
         return events
 
@@ -819,7 +961,9 @@ class EventStore(object):
 
         events = EventList(key, name)
         # Start scanning
-        row = self.table().get_first_row(start_search_row, column_families=columns, end_key=end_search_row)
+        row = self.table().get_first_row(
+            start_search_row, column_families=columns, end_key=end_search_row
+        )
         if row is not None:
             row_key, data_dict = row
             row_keys.append(row_key)
@@ -837,16 +981,26 @@ class EventStore(object):
 
         timer = time.time() - timer
         # emit signal
-        signal_payload = {"count": len(row_keys), "row_keys": row_keys, "timer": timer, "method": "SCAN"}
-        sig = signal('event.last')
+        signal_payload = {
+            "count": len(row_keys),
+            "row_keys": row_keys,
+            "timer": timer,
+            "method": "SCAN",
+        }
+        sig = signal("event.last")
         sig.send(self, info=signal_payload)
-        logger.debug("SCAN EVENTS: {}.{}, {} points in {}".format(key, name, len(events), timer), extra=signal_payload)
+        logger.debug(
+            "SCAN EVENTS: {}.{}, {} points in {}".format(key, name, len(events), timer),
+            extra=signal_payload,
+        )
         # print("SCAN EVENTS: {}.{}, {} points in {}".format(key, name, len(events), timer))
         return events
 
     def delete_event_days(self, key, name, from_ts, to_ts):
         if self.connection_object.read_only:
-            raise RuntimeError("Cannot execute delete_event_days command in readonly mode")
+            raise RuntimeError(
+                "Cannot execute delete_event_days command in readonly mode"
+            )
 
         assert from_ts <= to_ts
         timer = time.time()
@@ -869,9 +1023,17 @@ class EventStore(object):
         timer = time.time() - timer
         count = len(row_keys)
         # emit signal
-        signal_payload = {"count": len(row_keys), "row_keys": row_keys, "timer": timer, "method": "DELETE"}
-        sig = signal('event.delete')
+        signal_payload = {
+            "count": len(row_keys),
+            "row_keys": row_keys,
+            "timer": timer,
+            "method": "DELETE",
+        }
+        sig = signal("event.delete")
         sig.send(self, info=signal_payload)
-        logger.debug("DELETE EVENTS: {}.{}, {} days in {}".format(key, name, count, timer), extra=signal_payload)
+        logger.debug(
+            "DELETE EVENTS: {}.{}, {} days in {}".format(key, name, count, timer),
+            extra=signal_payload,
+        )
         # print("DELETE EVENTS: {}.{}, {} days in {}".format(key, name, count, timer))
         return count

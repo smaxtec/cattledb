@@ -21,7 +21,9 @@ class PyFallbackTest(unittest.TestCase):
         end = pendulum.now("Europe/Vienna")
         start = end.subtract(minutes=199)
 
-        data = [(start.add(minutes=n).isoformat(), random.random()) for n in range(0, 200)]
+        data = [
+            (start.add(minutes=n).isoformat(), random.random()) for n in range(0, 200)
+        ]
         random.shuffle(data)
 
         for ts, val in data:
@@ -37,7 +39,7 @@ class PyFallbackTest(unittest.TestCase):
         assert t1.at_index(0)[0] == start.int_timestamp
 
         assert t1.iso_at_index(0)[0] == start.replace(microsecond=0).isoformat()
-        assert t1.iso_at_index(len(t1)-1)[0] == end.replace(microsecond=0).isoformat()
+        assert t1.iso_at_index(len(t1) - 1)[0] == end.replace(microsecond=0).isoformat()
 
     def test_timezone(self):
         t1 = PyTSList("abc", "def")
@@ -50,16 +52,18 @@ class PyFallbackTest(unittest.TestCase):
 
     def test_canada(self):
         t1 = PyTSList("abc", "def")
-        dt = pendulum.datetime(2019, 2, 12, 8, 15, 32, tz='America/Toronto').replace(microsecond=0)
+        dt = pendulum.datetime(2019, 2, 12, 8, 15, 32, tz="America/Toronto").replace(
+            microsecond=0
+        )
         iso_str = dt.isoformat()
         t1.insert_iso(iso_str, 0.1)
         assert t1.at_index(0)[0] == dt.int_timestamp
-        assert t1.at_index(0)[1] == -5*3600
+        assert t1.at_index(0)[1] == -5 * 3600
         assert t1.iso_at_index(0)[0] == "2019-02-12T08:15:32-05:00"
 
     def test_vienna(self):
         t1 = PyTSList("abc", "def")
-        dt = pendulum.datetime(2008, 3, 3, 12, 0, 0, tz='Europe/Vienna')
+        dt = pendulum.datetime(2008, 3, 3, 12, 0, 0, tz="Europe/Vienna")
         iso_str = dt.isoformat()
         t1.insert_iso(iso_str, 0.1)
         assert t1.at_index(0)[0] == dt.int_timestamp
@@ -119,9 +123,9 @@ class PyFallbackTest(unittest.TestCase):
         ts = pendulum.now("utc").int_timestamp
         t2.insert_datetime(ts, float(2.2))
         self.assertEqual(len(t2), 1)
-        t2.trim_ts(ts, ts+1)
+        t2.trim_ts(ts, ts + 1)
         self.assertEqual(len(t2), 1)
-        t2.trim_ts(ts+1, ts+2)
+        t2.trim_ts(ts + 1, ts + 2)
         self.assertEqual(len(t2), 0)
 
         # test left
@@ -129,9 +133,9 @@ class PyFallbackTest(unittest.TestCase):
         ts = pendulum.now("utc").int_timestamp
         t3.insert_datetime(ts, float(2.2))
         self.assertEqual(len(t3), 1)
-        t3.trim_ts(ts-1, ts)
+        t3.trim_ts(ts - 1, ts)
         self.assertEqual(len(t3), 1)
-        t3.trim_ts(ts-2, ts-1)
+        t3.trim_ts(ts - 2, ts - 1)
         self.assertEqual(len(t3), 0)
 
     def test_index(self):

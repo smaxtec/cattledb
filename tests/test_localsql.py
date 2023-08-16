@@ -59,7 +59,9 @@ class LocalSQLTest(unittest.TestCase):
         self.assertIn("p:k", res[1][1])
         self.assertNotIn("i:k", res[1][1])
 
-        res = table.read_rows(row_keys=["abc#2#1", "abc#3#1"], column_families=["p", "i"])
+        res = table.read_rows(
+            row_keys=["abc#2#1", "abc#3#1"], column_families=["p", "i"]
+        )
         self.assertEqual(len(res), 2)
         self.assertIn("p:k", res[0][1])
         self.assertIn("i:k", res[0][1])
@@ -84,7 +86,9 @@ class LocalSQLTest(unittest.TestCase):
         res = table.read_rows(start_key="abc#2", end_key="abc#3#2")
         self.assertEqual(len(res), 5)
 
-        res = table.read_rows(start_key="abc#2", end_key="abc#3#2", column_families=["i"])
+        res = table.read_rows(
+            start_key="abc#2", end_key="abc#3#2", column_families=["i"]
+        )
         self.assertEqual(len(res), 3)
 
     def test_schema(self):

@@ -5,380 +5,374 @@ from . import cdb_pb2 as cdb__pb2
 
 
 class TimeSeriesStub(object):
-  # missing associated documentation comment in .proto file
-  pass
+    # missing associated documentation comment in .proto file
+    pass
 
-  def __init__(self, channel):
-    """Constructor.
+    def __init__(self, channel):
+        """Constructor.
 
-    Args:
-      channel: A grpc.Channel.
-    """
-    self.get = channel.unary_unary(
-        '/TimeSeries/get',
-        request_serializer=cdb__pb2.TimeSeriesRequest.SerializeToString,
-        response_deserializer=cdb__pb2.FloatTimeSeries.FromString,
+        Args:
+          channel: A grpc.Channel.
+        """
+        self.get = channel.unary_unary(
+            "/TimeSeries/get",
+            request_serializer=cdb__pb2.TimeSeriesRequest.SerializeToString,
+            response_deserializer=cdb__pb2.FloatTimeSeries.FromString,
         )
-    self.getMulti = channel.unary_unary(
-        '/TimeSeries/getMulti',
-        request_serializer=cdb__pb2.MultiTimeSeriesRequest.SerializeToString,
-        response_deserializer=cdb__pb2.FloatTimeSeriesList.FromString,
+        self.getMulti = channel.unary_unary(
+            "/TimeSeries/getMulti",
+            request_serializer=cdb__pb2.MultiTimeSeriesRequest.SerializeToString,
+            response_deserializer=cdb__pb2.FloatTimeSeriesList.FromString,
         )
-    self.lastValues = channel.unary_unary(
-        '/TimeSeries/lastValues',
-        request_serializer=cdb__pb2.LastValuesRequest.SerializeToString,
-        response_deserializer=cdb__pb2.FloatTimeSeriesList.FromString,
+        self.lastValues = channel.unary_unary(
+            "/TimeSeries/lastValues",
+            request_serializer=cdb__pb2.LastValuesRequest.SerializeToString,
+            response_deserializer=cdb__pb2.FloatTimeSeriesList.FromString,
         )
-    self.put = channel.unary_unary(
-        '/TimeSeries/put',
-        request_serializer=cdb__pb2.FloatTimeSeries.SerializeToString,
-        response_deserializer=cdb__pb2.PutResult.FromString,
+        self.put = channel.unary_unary(
+            "/TimeSeries/put",
+            request_serializer=cdb__pb2.FloatTimeSeries.SerializeToString,
+            response_deserializer=cdb__pb2.PutResult.FromString,
         )
-    self.putMulti = channel.unary_unary(
-        '/TimeSeries/putMulti',
-        request_serializer=cdb__pb2.FloatTimeSeriesList.SerializeToString,
-        response_deserializer=cdb__pb2.PutResult.FromString,
+        self.putMulti = channel.unary_unary(
+            "/TimeSeries/putMulti",
+            request_serializer=cdb__pb2.FloatTimeSeriesList.SerializeToString,
+            response_deserializer=cdb__pb2.PutResult.FromString,
         )
-    self.delete = channel.unary_unary(
-        '/TimeSeries/delete',
-        request_serializer=cdb__pb2.MultiTimeSeriesRequest.SerializeToString,
-        response_deserializer=cdb__pb2.DeleteResult.FromString,
+        self.delete = channel.unary_unary(
+            "/TimeSeries/delete",
+            request_serializer=cdb__pb2.MultiTimeSeriesRequest.SerializeToString,
+            response_deserializer=cdb__pb2.DeleteResult.FromString,
         )
 
 
 class TimeSeriesServicer(object):
-  # missing associated documentation comment in .proto file
-  pass
-
-  def get(self, request, context):
-    """pull
-    """
-    context.set_code(grpc.StatusCode.UNIMPLEMENTED)
-    context.set_details('Method not implemented!')
-    raise NotImplementedError('Method not implemented!')
-
-  def getMulti(self, request, context):
     # missing associated documentation comment in .proto file
     pass
-    context.set_code(grpc.StatusCode.UNIMPLEMENTED)
-    context.set_details('Method not implemented!')
-    raise NotImplementedError('Method not implemented!')
 
-  def lastValues(self, request, context):
-    # missing associated documentation comment in .proto file
-    pass
-    context.set_code(grpc.StatusCode.UNIMPLEMENTED)
-    context.set_details('Method not implemented!')
-    raise NotImplementedError('Method not implemented!')
+    def get(self, request, context):
+        """pull"""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details("Method not implemented!")
+        raise NotImplementedError("Method not implemented!")
 
-  def put(self, request, context):
-    """push
-    """
-    context.set_code(grpc.StatusCode.UNIMPLEMENTED)
-    context.set_details('Method not implemented!')
-    raise NotImplementedError('Method not implemented!')
+    def getMulti(self, request, context):
+        # missing associated documentation comment in .proto file
+        pass
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details("Method not implemented!")
+        raise NotImplementedError("Method not implemented!")
 
-  def putMulti(self, request, context):
-    # missing associated documentation comment in .proto file
-    pass
-    context.set_code(grpc.StatusCode.UNIMPLEMENTED)
-    context.set_details('Method not implemented!')
-    raise NotImplementedError('Method not implemented!')
+    def lastValues(self, request, context):
+        # missing associated documentation comment in .proto file
+        pass
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details("Method not implemented!")
+        raise NotImplementedError("Method not implemented!")
 
-  def delete(self, request, context):
-    """delete
-    """
-    context.set_code(grpc.StatusCode.UNIMPLEMENTED)
-    context.set_details('Method not implemented!')
-    raise NotImplementedError('Method not implemented!')
+    def put(self, request, context):
+        """push"""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details("Method not implemented!")
+        raise NotImplementedError("Method not implemented!")
+
+    def putMulti(self, request, context):
+        # missing associated documentation comment in .proto file
+        pass
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details("Method not implemented!")
+        raise NotImplementedError("Method not implemented!")
+
+    def delete(self, request, context):
+        """delete"""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details("Method not implemented!")
+        raise NotImplementedError("Method not implemented!")
 
 
 def add_TimeSeriesServicer_to_server(servicer, server):
-  rpc_method_handlers = {
-      'get': grpc.unary_unary_rpc_method_handler(
-          servicer.get,
-          request_deserializer=cdb__pb2.TimeSeriesRequest.FromString,
-          response_serializer=cdb__pb2.FloatTimeSeries.SerializeToString,
-      ),
-      'getMulti': grpc.unary_unary_rpc_method_handler(
-          servicer.getMulti,
-          request_deserializer=cdb__pb2.MultiTimeSeriesRequest.FromString,
-          response_serializer=cdb__pb2.FloatTimeSeriesList.SerializeToString,
-      ),
-      'lastValues': grpc.unary_unary_rpc_method_handler(
-          servicer.lastValues,
-          request_deserializer=cdb__pb2.LastValuesRequest.FromString,
-          response_serializer=cdb__pb2.FloatTimeSeriesList.SerializeToString,
-      ),
-      'put': grpc.unary_unary_rpc_method_handler(
-          servicer.put,
-          request_deserializer=cdb__pb2.FloatTimeSeries.FromString,
-          response_serializer=cdb__pb2.PutResult.SerializeToString,
-      ),
-      'putMulti': grpc.unary_unary_rpc_method_handler(
-          servicer.putMulti,
-          request_deserializer=cdb__pb2.FloatTimeSeriesList.FromString,
-          response_serializer=cdb__pb2.PutResult.SerializeToString,
-      ),
-      'delete': grpc.unary_unary_rpc_method_handler(
-          servicer.delete,
-          request_deserializer=cdb__pb2.MultiTimeSeriesRequest.FromString,
-          response_serializer=cdb__pb2.DeleteResult.SerializeToString,
-      ),
-  }
-  generic_handler = grpc.method_handlers_generic_handler(
-      'TimeSeries', rpc_method_handlers)
-  server.add_generic_rpc_handlers((generic_handler,))
+    rpc_method_handlers = {
+        "get": grpc.unary_unary_rpc_method_handler(
+            servicer.get,
+            request_deserializer=cdb__pb2.TimeSeriesRequest.FromString,
+            response_serializer=cdb__pb2.FloatTimeSeries.SerializeToString,
+        ),
+        "getMulti": grpc.unary_unary_rpc_method_handler(
+            servicer.getMulti,
+            request_deserializer=cdb__pb2.MultiTimeSeriesRequest.FromString,
+            response_serializer=cdb__pb2.FloatTimeSeriesList.SerializeToString,
+        ),
+        "lastValues": grpc.unary_unary_rpc_method_handler(
+            servicer.lastValues,
+            request_deserializer=cdb__pb2.LastValuesRequest.FromString,
+            response_serializer=cdb__pb2.FloatTimeSeriesList.SerializeToString,
+        ),
+        "put": grpc.unary_unary_rpc_method_handler(
+            servicer.put,
+            request_deserializer=cdb__pb2.FloatTimeSeries.FromString,
+            response_serializer=cdb__pb2.PutResult.SerializeToString,
+        ),
+        "putMulti": grpc.unary_unary_rpc_method_handler(
+            servicer.putMulti,
+            request_deserializer=cdb__pb2.FloatTimeSeriesList.FromString,
+            response_serializer=cdb__pb2.PutResult.SerializeToString,
+        ),
+        "delete": grpc.unary_unary_rpc_method_handler(
+            servicer.delete,
+            request_deserializer=cdb__pb2.MultiTimeSeriesRequest.FromString,
+            response_serializer=cdb__pb2.DeleteResult.SerializeToString,
+        ),
+    }
+    generic_handler = grpc.method_handlers_generic_handler(
+        "TimeSeries", rpc_method_handlers
+    )
+    server.add_generic_rpc_handlers((generic_handler,))
 
 
 class EventsStub(object):
-  # missing associated documentation comment in .proto file
-  pass
+    # missing associated documentation comment in .proto file
+    pass
 
-  def __init__(self, channel):
-    """Constructor.
+    def __init__(self, channel):
+        """Constructor.
 
-    Args:
-      channel: A grpc.Channel.
-    """
-    self.get = channel.unary_unary(
-        '/Events/get',
-        request_serializer=cdb__pb2.EventsRequest.SerializeToString,
-        response_deserializer=cdb__pb2.EventSeries.FromString,
+        Args:
+          channel: A grpc.Channel.
+        """
+        self.get = channel.unary_unary(
+            "/Events/get",
+            request_serializer=cdb__pb2.EventsRequest.SerializeToString,
+            response_deserializer=cdb__pb2.EventSeries.FromString,
         )
-    self.lastEvents = channel.unary_unary(
-        '/Events/lastEvents',
-        request_serializer=cdb__pb2.LastEventsRequest.SerializeToString,
-        response_deserializer=cdb__pb2.EventSeries.FromString,
+        self.lastEvents = channel.unary_unary(
+            "/Events/lastEvents",
+            request_serializer=cdb__pb2.LastEventsRequest.SerializeToString,
+            response_deserializer=cdb__pb2.EventSeries.FromString,
         )
-    self.put = channel.unary_unary(
-        '/Events/put',
-        request_serializer=cdb__pb2.EventSeries.SerializeToString,
-        response_deserializer=cdb__pb2.PutResult.FromString,
+        self.put = channel.unary_unary(
+            "/Events/put",
+            request_serializer=cdb__pb2.EventSeries.SerializeToString,
+            response_deserializer=cdb__pb2.PutResult.FromString,
         )
-    self.delete = channel.unary_unary(
-        '/Events/delete',
-        request_serializer=cdb__pb2.EventsRequest.SerializeToString,
-        response_deserializer=cdb__pb2.DeleteResult.FromString,
+        self.delete = channel.unary_unary(
+            "/Events/delete",
+            request_serializer=cdb__pb2.EventsRequest.SerializeToString,
+            response_deserializer=cdb__pb2.DeleteResult.FromString,
         )
 
 
 class EventsServicer(object):
-  # missing associated documentation comment in .proto file
-  pass
-
-  def get(self, request, context):
-    """pull
-    """
-    context.set_code(grpc.StatusCode.UNIMPLEMENTED)
-    context.set_details('Method not implemented!')
-    raise NotImplementedError('Method not implemented!')
-
-  def lastEvents(self, request, context):
     # missing associated documentation comment in .proto file
     pass
-    context.set_code(grpc.StatusCode.UNIMPLEMENTED)
-    context.set_details('Method not implemented!')
-    raise NotImplementedError('Method not implemented!')
 
-  def put(self, request, context):
-    """push
-    """
-    context.set_code(grpc.StatusCode.UNIMPLEMENTED)
-    context.set_details('Method not implemented!')
-    raise NotImplementedError('Method not implemented!')
+    def get(self, request, context):
+        """pull"""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details("Method not implemented!")
+        raise NotImplementedError("Method not implemented!")
 
-  def delete(self, request, context):
-    """delete
-    """
-    context.set_code(grpc.StatusCode.UNIMPLEMENTED)
-    context.set_details('Method not implemented!')
-    raise NotImplementedError('Method not implemented!')
+    def lastEvents(self, request, context):
+        # missing associated documentation comment in .proto file
+        pass
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details("Method not implemented!")
+        raise NotImplementedError("Method not implemented!")
+
+    def put(self, request, context):
+        """push"""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details("Method not implemented!")
+        raise NotImplementedError("Method not implemented!")
+
+    def delete(self, request, context):
+        """delete"""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details("Method not implemented!")
+        raise NotImplementedError("Method not implemented!")
 
 
 def add_EventsServicer_to_server(servicer, server):
-  rpc_method_handlers = {
-      'get': grpc.unary_unary_rpc_method_handler(
-          servicer.get,
-          request_deserializer=cdb__pb2.EventsRequest.FromString,
-          response_serializer=cdb__pb2.EventSeries.SerializeToString,
-      ),
-      'lastEvents': grpc.unary_unary_rpc_method_handler(
-          servicer.lastEvents,
-          request_deserializer=cdb__pb2.LastEventsRequest.FromString,
-          response_serializer=cdb__pb2.EventSeries.SerializeToString,
-      ),
-      'put': grpc.unary_unary_rpc_method_handler(
-          servicer.put,
-          request_deserializer=cdb__pb2.EventSeries.FromString,
-          response_serializer=cdb__pb2.PutResult.SerializeToString,
-      ),
-      'delete': grpc.unary_unary_rpc_method_handler(
-          servicer.delete,
-          request_deserializer=cdb__pb2.EventsRequest.FromString,
-          response_serializer=cdb__pb2.DeleteResult.SerializeToString,
-      ),
-  }
-  generic_handler = grpc.method_handlers_generic_handler(
-      'Events', rpc_method_handlers)
-  server.add_generic_rpc_handlers((generic_handler,))
+    rpc_method_handlers = {
+        "get": grpc.unary_unary_rpc_method_handler(
+            servicer.get,
+            request_deserializer=cdb__pb2.EventsRequest.FromString,
+            response_serializer=cdb__pb2.EventSeries.SerializeToString,
+        ),
+        "lastEvents": grpc.unary_unary_rpc_method_handler(
+            servicer.lastEvents,
+            request_deserializer=cdb__pb2.LastEventsRequest.FromString,
+            response_serializer=cdb__pb2.EventSeries.SerializeToString,
+        ),
+        "put": grpc.unary_unary_rpc_method_handler(
+            servicer.put,
+            request_deserializer=cdb__pb2.EventSeries.FromString,
+            response_serializer=cdb__pb2.PutResult.SerializeToString,
+        ),
+        "delete": grpc.unary_unary_rpc_method_handler(
+            servicer.delete,
+            request_deserializer=cdb__pb2.EventsRequest.FromString,
+            response_serializer=cdb__pb2.DeleteResult.SerializeToString,
+        ),
+    }
+    generic_handler = grpc.method_handlers_generic_handler(
+        "Events", rpc_method_handlers
+    )
+    server.add_generic_rpc_handlers((generic_handler,))
 
 
 class ActivityStub(object):
-  """def incr_activity(self, reader_id, device_id, timestamp, parent_ids=None, value=1):
-  def get_total_activity_for_day(self, day_ts):
-  def get_activity_for_reader(self, reader_id, from_ts, to_ts):
-  def get_activity_for_day(self, parent_id, day_ts):
+    """def incr_activity(self, reader_id, device_id, timestamp, parent_ids=None, value=1):
+    def get_total_activity_for_day(self, day_ts):
+    def get_activity_for_reader(self, reader_id, from_ts, to_ts):
+    def get_activity_for_day(self, parent_id, day_ts):
 
-  """
-
-  def __init__(self, channel):
-    """Constructor.
-
-    Args:
-      channel: A grpc.Channel.
     """
-    self.getTotal = channel.unary_unary(
-        '/Activity/getTotal',
-        request_serializer=cdb__pb2.TotalActivityRequest.SerializeToString,
-        response_deserializer=cdb__pb2.ActivityResponse.FromString,
+
+    def __init__(self, channel):
+        """Constructor.
+
+        Args:
+          channel: A grpc.Channel.
+        """
+        self.getTotal = channel.unary_unary(
+            "/Activity/getTotal",
+            request_serializer=cdb__pb2.TotalActivityRequest.SerializeToString,
+            response_deserializer=cdb__pb2.ActivityResponse.FromString,
         )
-    self.getDay = channel.unary_unary(
-        '/Activity/getDay',
-        request_serializer=cdb__pb2.ActivityDayRequest.SerializeToString,
-        response_deserializer=cdb__pb2.ActivityResponse.FromString,
+        self.getDay = channel.unary_unary(
+            "/Activity/getDay",
+            request_serializer=cdb__pb2.ActivityDayRequest.SerializeToString,
+            response_deserializer=cdb__pb2.ActivityResponse.FromString,
         )
-    self.getReader = channel.unary_unary(
-        '/Activity/getReader',
-        request_serializer=cdb__pb2.ReaderActivityRequest.SerializeToString,
-        response_deserializer=cdb__pb2.DeviceActivityResponse.FromString,
+        self.getReader = channel.unary_unary(
+            "/Activity/getReader",
+            request_serializer=cdb__pb2.ReaderActivityRequest.SerializeToString,
+            response_deserializer=cdb__pb2.DeviceActivityResponse.FromString,
         )
-    self.increment = channel.unary_unary(
-        '/Activity/increment',
-        request_serializer=cdb__pb2.IncrementActivityRequest.SerializeToString,
-        response_deserializer=cdb__pb2.PutResult.FromString,
+        self.increment = channel.unary_unary(
+            "/Activity/increment",
+            request_serializer=cdb__pb2.IncrementActivityRequest.SerializeToString,
+            response_deserializer=cdb__pb2.PutResult.FromString,
         )
 
 
 class ActivityServicer(object):
-  """def incr_activity(self, reader_id, device_id, timestamp, parent_ids=None, value=1):
-  def get_total_activity_for_day(self, day_ts):
-  def get_activity_for_reader(self, reader_id, from_ts, to_ts):
-  def get_activity_for_day(self, parent_id, day_ts):
+    """def incr_activity(self, reader_id, device_id, timestamp, parent_ids=None, value=1):
+    def get_total_activity_for_day(self, day_ts):
+    def get_activity_for_reader(self, reader_id, from_ts, to_ts):
+    def get_activity_for_day(self, parent_id, day_ts):
 
-  """
-
-  def getTotal(self, request, context):
-    """pull
     """
-    context.set_code(grpc.StatusCode.UNIMPLEMENTED)
-    context.set_details('Method not implemented!')
-    raise NotImplementedError('Method not implemented!')
 
-  def getDay(self, request, context):
-    # missing associated documentation comment in .proto file
-    pass
-    context.set_code(grpc.StatusCode.UNIMPLEMENTED)
-    context.set_details('Method not implemented!')
-    raise NotImplementedError('Method not implemented!')
+    def getTotal(self, request, context):
+        """pull"""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details("Method not implemented!")
+        raise NotImplementedError("Method not implemented!")
 
-  def getReader(self, request, context):
-    # missing associated documentation comment in .proto file
-    pass
-    context.set_code(grpc.StatusCode.UNIMPLEMENTED)
-    context.set_details('Method not implemented!')
-    raise NotImplementedError('Method not implemented!')
+    def getDay(self, request, context):
+        # missing associated documentation comment in .proto file
+        pass
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details("Method not implemented!")
+        raise NotImplementedError("Method not implemented!")
 
-  def increment(self, request, context):
-    """push
-    """
-    context.set_code(grpc.StatusCode.UNIMPLEMENTED)
-    context.set_details('Method not implemented!')
-    raise NotImplementedError('Method not implemented!')
+    def getReader(self, request, context):
+        # missing associated documentation comment in .proto file
+        pass
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details("Method not implemented!")
+        raise NotImplementedError("Method not implemented!")
+
+    def increment(self, request, context):
+        """push"""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details("Method not implemented!")
+        raise NotImplementedError("Method not implemented!")
 
 
 def add_ActivityServicer_to_server(servicer, server):
-  rpc_method_handlers = {
-      'getTotal': grpc.unary_unary_rpc_method_handler(
-          servicer.getTotal,
-          request_deserializer=cdb__pb2.TotalActivityRequest.FromString,
-          response_serializer=cdb__pb2.ActivityResponse.SerializeToString,
-      ),
-      'getDay': grpc.unary_unary_rpc_method_handler(
-          servicer.getDay,
-          request_deserializer=cdb__pb2.ActivityDayRequest.FromString,
-          response_serializer=cdb__pb2.ActivityResponse.SerializeToString,
-      ),
-      'getReader': grpc.unary_unary_rpc_method_handler(
-          servicer.getReader,
-          request_deserializer=cdb__pb2.ReaderActivityRequest.FromString,
-          response_serializer=cdb__pb2.DeviceActivityResponse.SerializeToString,
-      ),
-      'increment': grpc.unary_unary_rpc_method_handler(
-          servicer.increment,
-          request_deserializer=cdb__pb2.IncrementActivityRequest.FromString,
-          response_serializer=cdb__pb2.PutResult.SerializeToString,
-      ),
-  }
-  generic_handler = grpc.method_handlers_generic_handler(
-      'Activity', rpc_method_handlers)
-  server.add_generic_rpc_handlers((generic_handler,))
+    rpc_method_handlers = {
+        "getTotal": grpc.unary_unary_rpc_method_handler(
+            servicer.getTotal,
+            request_deserializer=cdb__pb2.TotalActivityRequest.FromString,
+            response_serializer=cdb__pb2.ActivityResponse.SerializeToString,
+        ),
+        "getDay": grpc.unary_unary_rpc_method_handler(
+            servicer.getDay,
+            request_deserializer=cdb__pb2.ActivityDayRequest.FromString,
+            response_serializer=cdb__pb2.ActivityResponse.SerializeToString,
+        ),
+        "getReader": grpc.unary_unary_rpc_method_handler(
+            servicer.getReader,
+            request_deserializer=cdb__pb2.ReaderActivityRequest.FromString,
+            response_serializer=cdb__pb2.DeviceActivityResponse.SerializeToString,
+        ),
+        "increment": grpc.unary_unary_rpc_method_handler(
+            servicer.increment,
+            request_deserializer=cdb__pb2.IncrementActivityRequest.FromString,
+            response_serializer=cdb__pb2.PutResult.SerializeToString,
+        ),
+    }
+    generic_handler = grpc.method_handlers_generic_handler(
+        "Activity", rpc_method_handlers
+    )
+    server.add_generic_rpc_handlers((generic_handler,))
 
 
 class MetaDataStub(object):
-  # missing associated documentation comment in .proto file
-  pass
+    # missing associated documentation comment in .proto file
+    pass
 
-  def __init__(self, channel):
-    """Constructor.
+    def __init__(self, channel):
+        """Constructor.
 
-    Args:
-      channel: A grpc.Channel.
-    """
-    self.get = channel.unary_unary(
-        '/MetaData/get',
-        request_serializer=cdb__pb2.MetaDataRequest.SerializeToString,
-        response_deserializer=cdb__pb2.MetaDataResponse.FromString,
+        Args:
+          channel: A grpc.Channel.
+        """
+        self.get = channel.unary_unary(
+            "/MetaData/get",
+            request_serializer=cdb__pb2.MetaDataRequest.SerializeToString,
+            response_deserializer=cdb__pb2.MetaDataResponse.FromString,
         )
-    self.put = channel.unary_unary(
-        '/MetaData/put',
-        request_serializer=cdb__pb2.MetaDataPost.SerializeToString,
-        response_deserializer=cdb__pb2.PutResult.FromString,
+        self.put = channel.unary_unary(
+            "/MetaData/put",
+            request_serializer=cdb__pb2.MetaDataPost.SerializeToString,
+            response_deserializer=cdb__pb2.PutResult.FromString,
         )
 
 
 class MetaDataServicer(object):
-  # missing associated documentation comment in .proto file
-  pass
+    # missing associated documentation comment in .proto file
+    pass
 
-  def get(self, request, context):
-    """pull
-    """
-    context.set_code(grpc.StatusCode.UNIMPLEMENTED)
-    context.set_details('Method not implemented!')
-    raise NotImplementedError('Method not implemented!')
+    def get(self, request, context):
+        """pull"""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details("Method not implemented!")
+        raise NotImplementedError("Method not implemented!")
 
-  def put(self, request, context):
-    """push
-    """
-    context.set_code(grpc.StatusCode.UNIMPLEMENTED)
-    context.set_details('Method not implemented!')
-    raise NotImplementedError('Method not implemented!')
+    def put(self, request, context):
+        """push"""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details("Method not implemented!")
+        raise NotImplementedError("Method not implemented!")
 
 
 def add_MetaDataServicer_to_server(servicer, server):
-  rpc_method_handlers = {
-      'get': grpc.unary_unary_rpc_method_handler(
-          servicer.get,
-          request_deserializer=cdb__pb2.MetaDataRequest.FromString,
-          response_serializer=cdb__pb2.MetaDataResponse.SerializeToString,
-      ),
-      'put': grpc.unary_unary_rpc_method_handler(
-          servicer.put,
-          request_deserializer=cdb__pb2.MetaDataPost.FromString,
-          response_serializer=cdb__pb2.PutResult.SerializeToString,
-      ),
-  }
-  generic_handler = grpc.method_handlers_generic_handler(
-      'MetaData', rpc_method_handlers)
-  server.add_generic_rpc_handlers((generic_handler,))
+    rpc_method_handlers = {
+        "get": grpc.unary_unary_rpc_method_handler(
+            servicer.get,
+            request_deserializer=cdb__pb2.MetaDataRequest.FromString,
+            response_serializer=cdb__pb2.MetaDataResponse.SerializeToString,
+        ),
+        "put": grpc.unary_unary_rpc_method_handler(
+            servicer.put,
+            request_deserializer=cdb__pb2.MetaDataPost.FromString,
+            response_serializer=cdb__pb2.PutResult.SerializeToString,
+        ),
+    }
+    generic_handler = grpc.method_handlers_generic_handler(
+        "MetaData", rpc_method_handlers
+    )
+    server.add_generic_rpc_handlers((generic_handler,))

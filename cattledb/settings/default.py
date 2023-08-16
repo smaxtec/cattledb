@@ -4,12 +4,16 @@
 import logging
 import os
 
-from cattledb.core.models import MetricDefinition, EventDefinition, MetricType, EventSeriesType
+from cattledb.core.models import (
+    MetricDefinition,
+    EventDefinition,
+    MetricType,
+    EventSeriesType,
+)
 
 
 METRICS = [
     MetricDefinition("test", "test", MetricType.FLOATSERIES, True),
-
     # Raw Metrics
     MetricDefinition("rawph", "rph", MetricType.FLOATSERIES, False),
     MetricDefinition("adcph", "aph", MetricType.FLOATSERIES, False),
@@ -17,21 +21,20 @@ METRICS = [
     MetricDefinition("adctemp", "atp", MetricType.FLOATSERIES, False),
     MetricDefinition("rawact", "rac", MetricType.FLOATSERIES, False),
     MetricDefinition("rawhum", "rhu", MetricType.FLOATSERIES, False),
-
     # Stage 1
     MetricDefinition("ph", "ph", MetricType.FLOATSERIES, True),
     MetricDefinition("temp", "tmp", MetricType.FLOATSERIES, True),
     MetricDefinition("act", "act", MetricType.FLOATSERIES, True),
     MetricDefinition("hum", "hum", MetricType.FLOATSERIES, True),
     MetricDefinition("act_index", "aci", MetricType.FLOATSERIES, True),
-    MetricDefinition("rawphuncorrected", "uph", MetricType.FLOATSERIES, True)
+    MetricDefinition("rawphuncorrected", "uph", MetricType.FLOATSERIES, True),
 ]
 
 
 EVENTS = [
     EventDefinition("test_daily", EventSeriesType.DAILY),
     EventDefinition("test_monthly", EventSeriesType.MONTHLY),
-    EventDefinition("test_monthly_*", EventSeriesType.MONTHLY)
+    EventDefinition("test_monthly_*", EventSeriesType.MONTHLY),
 ]
 
 
@@ -44,7 +47,7 @@ ENGINE_OPTIONS = {
     "credentials": None,
     "project_id": "proj1",
     "instance_id": "inst1",
-    "assert_limits": True
+    "assert_limits": True,
 }
 
 
@@ -61,11 +64,8 @@ LOGGING_CONFIG = {
         "console": {
             "class": "logging.StreamHandler",
             "level": "INFO",
-            "stream": "ext://sys.stdout"
+            "stream": "ext://sys.stdout",
         }
     },
-    "root": {
-        "level": "INFO",
-        "handlers": ["console"]
-    }
+    "root": {"level": "INFO", "handlers": ["console"]},
 }

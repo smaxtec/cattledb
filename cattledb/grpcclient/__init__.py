@@ -6,7 +6,13 @@ import grpc
 
 from ..grpcserver import cdb_pb2 as cdb_pb2
 from ..grpcserver import cdb_pb2_grpc as cdb_pb2_grpc
-from ..storage.models import TimeSeries, EventList, SerializableNamespaceDict, ReaderActivityItem, DeviceActivityItem
+from ..storage.models import (
+    TimeSeries,
+    EventList,
+    SerializableNamespaceDict,
+    ReaderActivityItem,
+    DeviceActivityItem,
+)
 
 
 class CDBClient(object):
@@ -15,12 +21,12 @@ class CDBClient(object):
         self.options = options
         if endpoint is not None:
             self.setup(endpoint, read_only, options)
-        #self.channel = grpc.insecure_channel(endpoint)
-        #self.setup()
-        #self.timeseries = cdb_pb2_grpc.TimeSeriesStub(self.channel)
-        #self.events = cdb_pb2_grpc.EventsStub(self.channel)
-        #self.metadata = cdb_pb2_grpc.MetaDataStub(self.channel)
-        #self.activity = cdb_pb2_grpc.ActivityStub(self.channel)
+        # self.channel = grpc.insecure_channel(endpoint)
+        # self.setup()
+        # self.timeseries = cdb_pb2_grpc.TimeSeriesStub(self.channel)
+        # self.events = cdb_pb2_grpc.EventsStub(self.channel)
+        # self.metadata = cdb_pb2_grpc.MetaDataStub(self.channel)
+        # self.activity = cdb_pb2_grpc.ActivityStub(self.channel)
 
     def setup(self, endpoint, read_only=False, options=None):
         self.read_only = read_only
@@ -31,7 +37,7 @@ class CDBClient(object):
         try:
             grpc.channel_ready_future(self.channel).result(timeout=10)
         except grpc.FutureTimeoutError:
-            raise RuntimeError('Error connecting to server: {}'.format(endpoint))
+            raise RuntimeError("Error connecting to server: {}".format(endpoint))
         else:
             self.timeseries = cdb_pb2_grpc.TimeSeriesStub(self.channel)
             self.events = cdb_pb2_grpc.EventsStub(self.channel)
@@ -47,9 +53,12 @@ class CDBClient(object):
     # --------------------------------------------------------------------------
 
     def get_timeseries(self, key, metrics, from_datetime, to_datetime):
-        req = cdb_pb2.MultiTimeSeriesRequest(key=key, metrics=metrics,
-                                            from_datetime=from_datetime.isoformat(),
-                                            to_datetime=to_datetime.isoformat())
+        req = cdb_pb2.MultiTimeSeriesRequest(
+            key=key,
+            metrics=metrics,
+            from_datetime=from_datetime.isoformat(),
+            to_datetime=to_datetime.isoformat(),
+        )
         ts = self.timeseries.getMulti(req)
         out = []
         for t in ts.data:
@@ -62,9 +71,12 @@ class CDBClient(object):
 
     def delete_timeseries(self, key, metrics, from_datetime, to_datetime):
         self.raise_on_read_only()
-        req = cdb_pb2.MultiTimeSeriesRequest(key=key, metrics=metrics,
-                                            from_datetime=from_datetime.isoformat(),
-                                            to_datetime=to_datetime.isoformat())
+        req = cdb_pb2.MultiTimeSeriesRequest(
+            key=key,
+            metrics=metrics,
+            from_datetime=from_datetime.isoformat(),
+            to_datetime=to_datetime.isoformat(),
+        )
         res = self.timeseries.delete(req)
         return int(res.counter)
 
@@ -114,9 +126,12 @@ class CDBClient(object):
         return int(res.counter)
 
     def get_events(self, key, name, from_datetime, to_datetime):
-        req = cdb_pb2.EventsRequest(key=key, name=name,
-                                    from_datetime=from_datetime.isoformat(),
-                                    to_datetime=to_datetime.isoformat())
+        req = cdb_pb2.EventsRequest(
+            key=key,
+            name=name,
+            from_datetime=from_datetime.isoformat(),
+            to_datetime=to_datetime.isoformat(),
+        )
         ts = self.events.get(req)
         return EventList.from_proto(ts)
 
@@ -127,9 +142,12 @@ class CDBClient(object):
 
     def delete_events(self, key, name, from_datetime, to_datetime):
         self.raise_on_read_only()
-        req = cdb_pb2.EventsRequest(key=key, name=name,
-                                    from_datetime=from_datetime.isoformat(),
-                                    to_datetime=to_datetime.isoformat())
+        req = cdb_pb2.EventsRequest(
+            key=key,
+            name=name,
+            from_datetime=from_datetime.isoformat(),
+            to_datetime=to_datetime.isoformat(),
+        )
         res = self.events.delete(req)
         return int(res.counter)
 
@@ -142,13 +160,16 @@ class CDBClient(object):
         if not isinstance(data, dict):
             raise ValueError("data should be a dict")
         d = SerializableNamespaceDict(namespace, data)
-        req = cdb_pb2.MetaDataPost(object_name=object_name, object_key=object_key, data=[d.to_proto()])
+        req = cdb_pb2.MetaDataPost(
+            object_name=object_name, object_key=object_key, data=[d.to_proto()]
+        )
         res = self.metadata.put(req)
         return int(res.counter)
 
     def get_metadata(self, object_name, object_key, namespaces=None):
-        req = cdb_pb2.MetaDataRequest(object_name=object_name, object_key=object_key,
-                                      namespaces=namespaces)
+        req = cdb_pb2.MetaDataRequest(
+            object_name=object_name, object_key=object_key, namespaces=namespaces
+        )
         ts = self.metadata.get(req)
         res = {"object_name": ts.object_name, "object_key": object_key, "data": {}}
         for i in ts.data:
@@ -162,8 +183,12 @@ class CDBClient(object):
 
     def incr_activity(self, reader_id, device_id, timestamp, parent_ids=None, value=1):
         self.raise_on_read_only()
-        req = cdb_pb2.IncrementActivityRequest(reader_id=reader_id, device_id=device_id,
-                                               timestamp=timestamp.isoformat(), value=value)
+        req = cdb_pb2.IncrementActivityRequest(
+            reader_id=reader_id,
+            device_id=device_id,
+            timestamp=timestamp.isoformat(),
+            value=value,
+        )
         if parent_ids is not None:
             req.parent_ids.extend(list(parent_ids))
         res = self.activity.increment(req)
@@ -178,7 +203,9 @@ class CDBClient(object):
         return res
 
     def get_day_activity(self, parent_id, day):
-        req = cdb_pb2.ActivityDayRequest(day_datetime=day.isoformat(), parent_id=parent_id)
+        req = cdb_pb2.ActivityDayRequest(
+            day_datetime=day.isoformat(), parent_id=parent_id
+        )
         ts = self.activity.getDay(req)
         res = []
         for act in ts.activities:
@@ -188,9 +215,11 @@ class CDBClient(object):
         return ts
 
     def get_reader_activity(self, reader_id, from_datetime, to_datetime):
-        req = cdb_pb2.ReaderActivityRequest(reader_id=reader_id,
-                                            from_datetime=from_datetime.isoformat(),
-                                            to_datetime=to_datetime.isoformat())
+        req = cdb_pb2.ReaderActivityRequest(
+            reader_id=reader_id,
+            from_datetime=from_datetime.isoformat(),
+            to_datetime=to_datetime.isoformat(),
+        )
         ts = self.activity.getReader(req)
         res = []
         for act in ts.activities:

@@ -16,6 +16,7 @@ from ..core.models import MetaDataItem
 from ..core.models import ReaderActivityItem
 from ..core.models import DeviceActivityItem
 
+
 class EventSeriesType(Enum):
     DAILY = 1
     MONTHLY = 2

@@ -61,7 +61,7 @@ class LocalFileStore(object):
         data = self.get_timeseries(key)
         old_metrics = data.columns or []
         metrics = set(old_metrics)
-        
+
         checked_dict = {}
         for k, v in value_dict.items():
             checked_dict[k] = float(v)

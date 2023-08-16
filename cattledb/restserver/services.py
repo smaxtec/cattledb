@@ -3,16 +3,16 @@ import pendulum
 from flask import jsonify, Blueprint, current_app, abort
 from ..core.models import FastDictTimeseries
 
-bp = Blueprint('base', __name__)
+bp = Blueprint("base", __name__)
 
 
-@bp.route('/')
+@bp.route("/")
 def base_root():
     db = current_app.cdb
     return jsonify(db.info())
 
 
-@bp.route('/metrics')
+@bp.route("/metrics")
 def metrics():
     db = current_app.cdb
     connection = db.get_connection()
@@ -22,7 +22,7 @@ def metrics():
     return jsonify(out)
 
 
-@bp.route('/events')
+@bp.route("/events")
 def events():
     db = current_app.cdb
     connection = db.get_connection()
@@ -32,21 +32,21 @@ def events():
     return jsonify(out)
 
 
-@bp.route('/database')
+@bp.route("/database")
 def database():
     db = current_app.cdb
     s = db.get_database_structure()
     return jsonify(s)
 
 
-@bp.route('/timeseries/<key>/<metric>/last_value')
+@bp.route("/timeseries/<key>/<metric>/last_value")
 def last_value(key, metric):
     db = current_app.cdb
     s = db.get_last_value(key, metric)
     return jsonify([x for x in s.get_serializable_iterator("iso")])
 
 
-@bp.route('/timeseries/<key>/<metric>/<int:days>days')
+@bp.route("/timeseries/<key>/<metric>/<int:days>days")
 def metric_days(key, metric, days):
     db = current_app.cdb
     t = pendulum.now("utc").add(hours=1)
@@ -55,7 +55,7 @@ def metric_days(key, metric, days):
     return jsonify([x for x in s.get_serializable_iterator("iso")])
 
 
-@bp.route('/timeseries/<key>/<int:days>days')
+@bp.route("/timeseries/<key>/<int:days>days")
 def days(key, days):
     db = current_app.cdb
     t = pendulum.now("utc").add(hours=1)
@@ -66,7 +66,7 @@ def days(key, days):
     return jsonify(None), 200
 
 
-@bp.route('/timeseries/<key>/full')
+@bp.route("/timeseries/<key>/full")
 def full_download(key):
     db = current_app.cdb
     res = db.get_full_timeseries(key)
