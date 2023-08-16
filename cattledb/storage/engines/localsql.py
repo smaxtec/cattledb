@@ -1,14 +1,13 @@
 #!/usr/bin/python
 # coding: utf-8
 
-import sqlite3
+import base64
+import json
 import logging
 import os
-import json
-import base64
+import sqlite3
 import struct
-
-from collections import defaultdict, OrderedDict
+from collections import OrderedDict, defaultdict
 from sqlite3 import OperationalError
 
 from .base import StorageEngine, StorageTable

@@ -4,9 +4,7 @@
 
 import warnings
 
-
 from ..directclient import CDBClient
-
 
 try:
     from flask import _app_ctx_stack as stack

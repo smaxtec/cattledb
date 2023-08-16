@@ -4,8 +4,8 @@
 import click
 
 from ..core.helper import import_config_file
-from ..settings import default as _default_config
 from ..directclient import CDBClient
+from ..settings import default as _default_config
 
 
 @click.group()
@@ -32,7 +32,8 @@ def cli(ctx, configfile, configclass):
     ctx.obj["config"] = config
 
 
-from .base import initdb, dbinfo, newmetric, newevent, runserver, download_timeseries
+from .base import (dbinfo, download_timeseries, initdb, newevent, newmetric,
+                   runserver)
 
 cli.add_command(initdb)
 cli.add_command(dbinfo)

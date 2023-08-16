@@ -4,13 +4,8 @@
 import logging
 import os
 
-from cattledb.core.models import (
-    MetricDefinition,
-    EventDefinition,
-    MetricType,
-    EventSeriesType,
-)
-
+from cattledb.core.models import (EventDefinition, EventSeriesType,
+                                  MetricDefinition, MetricType)
 
 METRICS = [
     MetricDefinition("test", "test", MetricType.FLOATSERIES, True),

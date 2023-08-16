@@ -1,19 +1,16 @@
 #!/usr/bin/python
 # coding: utf-8
-from builtins import str
-
-import os
 import logging
-import grpc
+import os
+from builtins import str
 from concurrent import futures
 
-from .cdb_pb2_grpc import (
-    add_TimeSeriesServicer_to_server,
-    add_EventsServicer_to_server,
-    add_MetaDataServicer_to_server,
-    add_ActivityServicer_to_server,
-)
+import grpc
 
+from .cdb_pb2_grpc import (add_ActivityServicer_to_server,
+                           add_EventsServicer_to_server,
+                           add_MetaDataServicer_to_server,
+                           add_TimeSeriesServicer_to_server)
 
 logger = logging.getLogger(__name__)
 

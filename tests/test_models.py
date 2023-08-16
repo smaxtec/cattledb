@@ -1,27 +1,21 @@
 #!/usr/bin/python
 # coding: utf-8
 
-import unittest
-import pendulum
-import random
-import logging
 import binascii
 import datetime
+import logging
+import random
+import unittest
 
-from cattledb.storage.models import TimeSeries, SerializableDict, EventList
-from cattledb.core.helper import (
-    to_ts,
-    daily_timestamps,
-    monthly_timestamps,
-    ts_daily_left,
-    ts_daily_right,
-    ts_weekly_left,
-    ts_weekly_right,
-    ts_monthly_left,
-    ts_monthly_right,
-    merge_lists_on_key,
-)
-from cattledb.grpcserver.cdb_pb2 import FloatTimeSeries, Dictionary
+import pendulum
+
+from cattledb.core.helper import (daily_timestamps, merge_lists_on_key,
+                                  monthly_timestamps, to_ts, ts_daily_left,
+                                  ts_daily_right, ts_monthly_left,
+                                  ts_monthly_right, ts_weekly_left,
+                                  ts_weekly_right)
+from cattledb.grpcserver.cdb_pb2 import Dictionary, FloatTimeSeries
+from cattledb.storage.models import EventList, SerializableDict, TimeSeries
 
 
 class ObjWithName(object):

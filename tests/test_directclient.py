@@ -1,19 +1,20 @@
 #!/usr/bin/python
 # coding: utf-8
 
-import unittest
-import random
-import logging
-import pendulum
-import os
 import datetime
-import mock
+import logging
+import os
+import random
 import time
+import unittest
 
+import mock
+import pendulum
 
 from cattledb.directclient import CDBClient, create_client
 from cattledb.storage.models import TimeSeries
-from .helper import get_unit_test_config, get_test_metrics
+
+from .helper import get_test_metrics, get_unit_test_config
 
 
 class DirectclientTests(unittest.TestCase):

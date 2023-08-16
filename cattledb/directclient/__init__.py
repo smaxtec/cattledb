@@ -3,15 +3,16 @@
 
 import logging
 import logging.config
-import pendulum
 import time
-
 from datetime import datetime
 from functools import partial
 
-from ..storage.connection import Connection
-from ..storage.models import TimeSeries, EventList, MetaDataItem, FastDictTimeseries
+import pendulum
+
 from ..core.helper import setup_logging
+from ..storage.connection import Connection
+from ..storage.models import (EventList, FastDictTimeseries, MetaDataItem,
+                              TimeSeries)
 
 
 def create_client(config):

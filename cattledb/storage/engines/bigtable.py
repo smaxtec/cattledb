@@ -1,30 +1,27 @@
 #!/usr/bin/python
 # coding: utf-8
 
-import os
 import logging
+import os
 import struct
 import time
-
 from collections import OrderedDict
 
-from google.cloud import bigtable
 from google.auth.credentials import AnonymousCredentials
-from google.cloud.bigtable.row_filters import (
-    CellsColumnLimitFilter,
-    FamilyNameRegexFilter,
-    RowFilterChain,
-    RowFilterUnion,
-    RowKeyRegexFilter,
-)
-from google.cloud.bigtable.row_set import RowSet
+from google.cloud import bigtable
 from google.cloud._helpers import _to_bytes
 from google.cloud.bigtable.column_family import MaxVersionsGCRule
+from google.cloud.bigtable.row_filters import (CellsColumnLimitFilter,
+                                               FamilyNameRegexFilter,
+                                               RowFilterChain, RowFilterUnion,
+                                               RowKeyRegexFilter)
+from google.cloud.bigtable.row_set import RowSet
+
+from .base import StorageEngine, StorageTable
 
 # from google.oauth2 import service_account
 
 
-from .base import StorageEngine, StorageTable
 
 
 logger = logging.getLogger(__name__)

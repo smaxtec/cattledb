@@ -1,11 +1,12 @@
 #!/usr/bin/python
 # coding: utf-8
 
-import unittest
-import random
-import pendulum
-import logging
 import json
+import logging
+import random
+import unittest
+
+import pendulum
 
 from cattledb.core._timeseries import PyTSList
 

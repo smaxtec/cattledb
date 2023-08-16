@@ -1,17 +1,18 @@
 #!/usr/bin/python
 # coding: utf-8
 
-import unittest
-import random
-import logging
-import pendulum
-import os
 import datetime
+import logging
+import os
+import random
+import unittest
 
+import pendulum
 
 from cattledb.storage.connection import Connection
 from cattledb.storage.models import RowUpsert
-from .helper import get_unit_test_config, get_test_connection
+
+from .helper import get_test_connection, get_unit_test_config
 
 
 class ConnectionTest(unittest.TestCase):

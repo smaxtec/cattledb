@@ -1,10 +1,10 @@
 #!/usr/bin/python
 # coding: utf-8
 
-import pendulum
-import datetime
 import bisect
+import datetime
 
+import pendulum
 
 try:
     from cdb_ext_ts import timeseries

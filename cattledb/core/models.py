@@ -3,33 +3,21 @@
 
 import abc
 import hashlib
-import pendulum
-import struct
-import msgpack
 import json
-
+import struct
+from collections import defaultdict, namedtuple
 from enum import Enum
-from collections import namedtuple, defaultdict
-from statistics import stdev, mean, median
+from statistics import mean, median, stdev
 
-from .helper import ts_daily_left, ts_daily_right
-from .helper import ts_monthly_left, ts_monthly_right
-from .helper import ts_hourly_left, ts_hourly_right
-from .helper import list_mean
+import msgpack
+import pendulum
+
+from ..grpcserver.cdb_pb2 import (DeviceActivity, Dictionary, DictTimeSeries,
+                                  EventSeries, FloatTimeSeries, MetaDataDict,
+                                  Pair, ReaderActivity)
 from ._timeseries import FloatTSList, PyTSList
-
-
-from ..grpcserver.cdb_pb2 import (
-    FloatTimeSeries,
-    Dictionary,
-    DictTimeSeries,
-    Pair,
-    MetaDataDict,
-    ReaderActivity,
-    DeviceActivity,
-    EventSeries,
-)
-
+from .helper import (list_mean, ts_daily_left, ts_daily_right, ts_hourly_left,
+                     ts_hourly_right, ts_monthly_left, ts_monthly_right)
 
 Point = namedtuple("Point", ["ts", "value", "dt"])
 RawPoint = namedtuple("RawPoint", ["ts", "value", "ts_offset"])

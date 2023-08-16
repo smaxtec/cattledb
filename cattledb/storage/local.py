@@ -1,12 +1,11 @@
 #!/usr/bin/python
 # coding: utf-8
 
-import pathlib
-import logging
 import csv
+import logging
+import pathlib
 
-
-from ..core.models import FastFloatTimeseries, FastDictTimeseries
+from ..core.models import FastDictTimeseries, FastFloatTimeseries
 
 logger = logging.getLogger(__name__)
 

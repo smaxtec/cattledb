@@ -2,16 +2,16 @@
 # coding: utf-8
 
 import logging
-import time
 import os
 import threading
+import time
 import warnings
 
 from grpc import RpcError
 
-from .engines import engine_factory, get_engine_capabilities
-from ..core.models import MetricDefinition, EventDefinition
 from ..core.helper import merge_lists_on_key
+from ..core.models import EventDefinition, MetricDefinition
+from .engines import engine_factory, get_engine_capabilities
 
 logger = logging.getLogger(__name__)
 

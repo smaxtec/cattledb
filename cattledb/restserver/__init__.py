@@ -5,7 +5,6 @@ import logging
 import logging.config
 import os
 
-
 # def init_s_db(app, loop):
 #     from ..directclient import AsyncCDBClient
 #     config = app.cdb_config
@@ -23,9 +22,9 @@ import os
 
 
 def _create_app(config):
-    from ..core.helper import setup_logging
-
     from flask import Flask
+
+    from ..core.helper import setup_logging
 
     app = Flask("cattledb")
 

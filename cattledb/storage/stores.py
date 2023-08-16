@@ -1,39 +1,25 @@
 #!/usr/bin/python
 # coding: utf-8
 
-import logging
-import time
-import struct
 import json
+import logging
+import struct
+import time
+from collections import defaultdict, namedtuple
 
 from blinker import signal
-from collections import namedtuple, defaultdict
 from google.cloud import bigtable
-from google.cloud.bigtable.row_filters import CellsColumnLimitFilter
 from google.cloud.bigtable.column_family import MaxVersionsGCRule
+from google.cloud.bigtable.row_filters import CellsColumnLimitFilter
 
-from ..core.helper import (
-    from_ts,
-    daily_timestamps,
-    get_metric_name_lookup,
-    get_metric_ids,
-    get_metric_names,
-    monthly_timestamps,
-    get_event_name_lookup,
-    get_metric_id_lookup,
-)
-from .models import (
-    TimeSeries,
-    EventList,
-    MetaDataItem,
-    SerializableDict,
-    ReaderActivityItem,
-    DeviceActivityItem,
-    RowUpsert,
-    EventSeriesType,
-)
+from ..core.helper import (daily_timestamps, from_ts, get_event_name_lookup,
+                           get_metric_id_lookup, get_metric_ids,
+                           get_metric_name_lookup, get_metric_names,
+                           monthly_timestamps)
 from ..grpcserver.cdb_pb2 import FloatTimeSeries, FloatTimeSeriesList
-
+from .models import (DeviceActivityItem, EventList, EventSeriesType,
+                     MetaDataItem, ReaderActivityItem, RowUpsert,
+                     SerializableDict, TimeSeries)
 
 logger = logging.getLogger(__name__)
 

@@ -1,14 +1,15 @@
 #!/usr/bin/python
 # coding: utf-8
 
-import unittest
-import pendulum
-import random
-import logging
 import binascii
 import datetime
+import logging
+import random
+import unittest
 
-from cattledb.core.models import FastFloatTimeseries, FastDictTimeseries
+import pendulum
+
+from cattledb.core.models import FastDictTimeseries, FastFloatTimeseries
 
 
 class ModelTest(unittest.TestCase):

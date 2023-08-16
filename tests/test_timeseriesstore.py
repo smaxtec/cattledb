@@ -1,18 +1,20 @@
 #!/usr/bin/python
 # coding: utf-8
 
-import unittest
-import random
-import logging
-import pendulum
-import os
 import datetime
-import mock
+import logging
+import os
+import random
 import time
+import unittest
+
+import mock
+import pendulum
 
 from cattledb.storage.connection import Connection
-from cattledb.storage.models import TimeSeries, FastDictTimeseries
-from .helper import get_unit_test_config, get_test_metrics
+from cattledb.storage.models import FastDictTimeseries, TimeSeries
+
+from .helper import get_test_metrics, get_unit_test_config
 
 
 class TimeSeriesStorageTest(unittest.TestCase):

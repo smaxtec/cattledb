@@ -2,10 +2,12 @@
 # coding: utf-8
 
 import os
-import click
 import time
 
-from ..core.models import MetricDefinition, EventDefinition, MetricType, EventSeriesType
+import click
+
+from ..core.models import (EventDefinition, EventSeriesType, MetricDefinition,
+                           MetricType)
 
 
 @click.command()

@@ -1,6 +1,6 @@
 import pendulum
+from flask import Blueprint, abort, current_app, jsonify
 
-from flask import jsonify, Blueprint, current_app, abort
 from ..core.models import FastDictTimeseries
 
 bp = Blueprint("base", __name__)
