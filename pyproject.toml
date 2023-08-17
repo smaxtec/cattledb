@@ -36,3 +36,6 @@ build-backend = "poetry.core.masonry.api"
 [tool.semantic_release]
 version_variable = [ "pyproject.toml:version" ]
 build_command = "poetry build"
+
+[tool.isort]
+profile = "black"
