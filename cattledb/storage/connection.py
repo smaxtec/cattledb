@@ -158,7 +158,7 @@ class Connection(object):
         engine = getattr(self.thread_local, "engine", None)
         if engine is None:
             # no engine found for this thread
-            t = threading.currentThread().getName()
+            t = threading.current_thread().name
             engine = self._new_engine()
             self.thread_local.engine = engine
             self.engines[t] = engine
