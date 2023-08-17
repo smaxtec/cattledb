@@ -1,8 +1,8 @@
 # Cattle DB #
 
 [![Build Tests](https://github.com/wuttem/cattledb/actions/workflows/python-package.yml/badge.svg)](https://github.com/wuttem/cattledb/actions/workflows/python-package.yml)
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 [![Mentioned in Awesome Bigtable](https://awesome.re/mentioned-badge-flat.svg)](https://github.com/zrosenbauer/awesome-bigtable)
-
 
 Fast Time Series Database Implementation.
 
