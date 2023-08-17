@@ -2,10 +2,8 @@
 # coding: utf-8
 
 import logging
-import os
 import threading
 import time
-import warnings
 
 from grpc import RpcError
 
@@ -217,8 +215,8 @@ class Connection(object):
     def database_init(self, silent=False):
         if not silent:
             try:
-                database_init = self.read_config("database_init")
-            except (KeyError, RpcError) as e:
+                self.read_config("database_init")
+            except (KeyError, RpcError):
                 pass
             else:
                 raise RuntimeError("database is already initialized")
@@ -265,7 +263,7 @@ class Connection(object):
     def new_metric_definition(self, metric_def):
         self.check_init()
         assert isinstance(metric_def, MetricDefinition)
-        name = metric_def.name
+        metric_def.name
         self.load_metric_definitions()
         self.add_metric_definitions([metric_def])
         self.store_metric_definitions()
@@ -329,7 +327,7 @@ class Connection(object):
 
     def restore_configuration(self):
         try:
-            database_init = self.read_config("database_init")
+            self.read_config("database_init")
         except KeyError:
             raise RuntimeError(
                 "no database configuration. make sure this database is initialized."

@@ -1,8 +1,6 @@
 #!/usr/bin/python
 # coding: utf-8
 
-import logging
-import logging.config
 import time
 from datetime import datetime
 from functools import partial
@@ -11,8 +9,7 @@ import pendulum
 
 from ..core.helper import setup_logging
 from ..storage.connection import Connection
-from ..storage.models import (EventList, FastDictTimeseries, MetaDataItem,
-                              TimeSeries)
+from ..storage.models import EventList, FastDictTimeseries, MetaDataItem, TimeSeries
 
 
 def create_client(config):

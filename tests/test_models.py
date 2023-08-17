@@ -9,11 +9,18 @@ import unittest
 
 import pendulum
 
-from cattledb.core.helper import (daily_timestamps, merge_lists_on_key,
-                                  monthly_timestamps, to_ts, ts_daily_left,
-                                  ts_daily_right, ts_monthly_left,
-                                  ts_monthly_right, ts_weekly_left,
-                                  ts_weekly_right)
+from cattledb.core.helper import (
+    daily_timestamps,
+    merge_lists_on_key,
+    monthly_timestamps,
+    to_ts,
+    ts_daily_left,
+    ts_daily_right,
+    ts_monthly_left,
+    ts_monthly_right,
+    ts_weekly_left,
+    ts_weekly_right,
+)
 from cattledb.grpcserver.cdb_pb2 import Dictionary, FloatTimeSeries
 from cattledb.storage.models import EventList, SerializableDict, TimeSeries
 
@@ -234,7 +241,7 @@ class ModelTest(unittest.TestCase):
 
     def test_proto(self):
         res = TimeSeries("ddd", "ph")
-        ts = to_ts(datetime.datetime(2000, 1, 1, 0, 0))
+        to_ts(datetime.datetime(2000, 1, 1, 0, 0))
         for j in range(500):
             res.insert_point(j * 600, float(j % 6))
         p = FloatTimeSeries()

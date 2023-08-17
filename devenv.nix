@@ -30,7 +30,8 @@
       isort.enable = true;
     };
     settings = {
-      autoflake.flags = "--in-place --remove-all-unused-imports --remove-unused-variables --ignore-init-module-imports";
+      autoflake.flags = "--in-place --remove-unused-variables --ignore-init-module-imports";
+      # --remove-all-unused-imports";
     };
   };
 }

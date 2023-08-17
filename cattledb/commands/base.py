@@ -6,8 +6,7 @@ import time
 
 import click
 
-from ..core.models import (EventDefinition, EventSeriesType, MetricDefinition,
-                           MetricType)
+from ..core.models import EventDefinition, EventSeriesType, MetricDefinition, MetricType
 
 
 @click.command()
@@ -59,7 +58,7 @@ def initdb(ctx, force):
 def dbinfo(ctx):
     """Show information of the selected Database."""
     db = ctx.obj["db"]
-    config = ctx.obj["config"]
+    ctx.obj["config"]
     db.service_init()
     assert db.init == True
     click.echo("Reading database structure ...")

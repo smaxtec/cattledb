@@ -32,8 +32,7 @@ def cli(ctx, configfile, configclass):
     ctx.obj["config"] = config
 
 
-from .base import (dbinfo, download_timeseries, initdb, newevent, newmetric,
-                   runserver)
+from .base import dbinfo, download_timeseries, initdb, newevent, newmetric, runserver
 
 cli.add_command(initdb)
 cli.add_command(dbinfo)

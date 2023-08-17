@@ -3,7 +3,6 @@
 
 import logging
 import logging.config
-import os
 
 # def init_s_db(app, loop):
 #     from ..directclient import AsyncCDBClient

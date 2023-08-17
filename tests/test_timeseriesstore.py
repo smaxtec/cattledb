@@ -3,7 +3,6 @@
 
 import datetime
 import logging
-import os
 import random
 import time
 import unittest
@@ -189,7 +188,7 @@ class TimeSeriesStorageTest(unittest.TestCase):
         s.connect(my_get_func)
 
         db.timeseries.insert_bulk(data)
-        r = db.timeseries.get_single_timeseries("sensor15", "ph", 0, 500 * 600 - 1)
+        db.timeseries.get_single_timeseries("sensor15", "ph", 0, 500 * 600 - 1)
 
         self.assertEqual(len(my_put_func.call_args_list), 1)
         self.assertIn("info", my_put_func.call_args_list[0][1])

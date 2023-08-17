@@ -58,14 +58,12 @@ class TimeSeriesServicer(object):
 
     def getMulti(self, request, context):
         # missing associated documentation comment in .proto file
-        pass
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details("Method not implemented!")
         raise NotImplementedError("Method not implemented!")
 
     def lastValues(self, request, context):
         # missing associated documentation comment in .proto file
-        pass
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details("Method not implemented!")
         raise NotImplementedError("Method not implemented!")
@@ -78,7 +76,6 @@ class TimeSeriesServicer(object):
 
     def putMulti(self, request, context):
         # missing associated documentation comment in .proto file
-        pass
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details("Method not implemented!")
         raise NotImplementedError("Method not implemented!")
@@ -173,7 +170,6 @@ class EventsServicer(object):
 
     def lastEvents(self, request, context):
         # missing associated documentation comment in .proto file
-        pass
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details("Method not implemented!")
         raise NotImplementedError("Method not implemented!")
@@ -272,14 +268,12 @@ class ActivityServicer(object):
 
     def getDay(self, request, context):
         # missing associated documentation comment in .proto file
-        pass
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details("Method not implemented!")
         raise NotImplementedError("Method not implemented!")
 
     def getReader(self, request, context):
         # missing associated documentation comment in .proto file
-        pass
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details("Method not implemented!")
         raise NotImplementedError("Method not implemented!")

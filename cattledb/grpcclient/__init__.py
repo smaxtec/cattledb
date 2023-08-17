@@ -1,15 +1,18 @@
 #!/usr/bin/python
 # coding: utf-8
 
-import os
 
 import grpc
 
 from ..grpcserver import cdb_pb2 as cdb_pb2
 from ..grpcserver import cdb_pb2_grpc as cdb_pb2_grpc
-from ..storage.models import (DeviceActivityItem, EventList,
-                              ReaderActivityItem, SerializableNamespaceDict,
-                              TimeSeries)
+from ..storage.models import (
+    DeviceActivityItem,
+    EventList,
+    ReaderActivityItem,
+    SerializableNamespaceDict,
+    TimeSeries,
+)
 
 
 class CDBClient(object):

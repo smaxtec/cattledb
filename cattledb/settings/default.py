@@ -1,11 +1,13 @@
 #!/usr/bin/python
 # coding: utf-8
 
-import logging
-import os
 
-from cattledb.core.models import (EventDefinition, EventSeriesType,
-                                  MetricDefinition, MetricType)
+from cattledb.core.models import (
+    EventDefinition,
+    EventSeriesType,
+    MetricDefinition,
+    MetricType,
+)
 
 METRICS = [
     MetricDefinition("test", "test", MetricType.FLOATSERIES, True),

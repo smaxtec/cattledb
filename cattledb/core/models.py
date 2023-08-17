@@ -12,12 +12,26 @@ from statistics import mean, median, stdev
 import msgpack
 import pendulum
 
-from ..grpcserver.cdb_pb2 import (DeviceActivity, Dictionary, DictTimeSeries,
-                                  EventSeries, FloatTimeSeries, MetaDataDict,
-                                  Pair, ReaderActivity)
+from ..grpcserver.cdb_pb2 import (
+    DeviceActivity,
+    Dictionary,
+    DictTimeSeries,
+    EventSeries,
+    FloatTimeSeries,
+    MetaDataDict,
+    Pair,
+    ReaderActivity,
+)
 from ._timeseries import FloatTSList, PyTSList
-from .helper import (list_mean, ts_daily_left, ts_daily_right, ts_hourly_left,
-                     ts_hourly_right, ts_monthly_left, ts_monthly_right)
+from .helper import (
+    list_mean,
+    ts_daily_left,
+    ts_daily_right,
+    ts_hourly_left,
+    ts_hourly_right,
+    ts_monthly_left,
+    ts_monthly_right,
+)
 
 Point = namedtuple("Point", ["ts", "value", "dt"])
 RawPoint = namedtuple("RawPoint", ["ts", "value", "ts_offset"])
@@ -290,7 +304,6 @@ class BaseTimeseries(object, metaclass=abc.ABCMeta):
         Aggregation Spans: hourly, daily, 10min
         Aggregation Types: mean, count, sum, min, max, all
         """
-        data = []
         if timestamp_format == "utc":
             timestamp_func = lambda x: x.ts
         elif timestamp_format == "local":

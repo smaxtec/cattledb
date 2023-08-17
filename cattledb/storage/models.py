@@ -3,10 +3,18 @@
 
 from enum import Enum
 
-from ..core.models import (DeviceActivityItem, EventList, FastDictTimeseries,
-                           FastFloatTimeseries, MetaDataItem,
-                           ReaderActivityItem, RowUpsert, SerializableDict,
-                           SerializableNamespaceDict, TimeSeries)
+from ..core.models import (
+    DeviceActivityItem,
+    EventList,
+    FastDictTimeseries,
+    FastFloatTimeseries,
+    MetaDataItem,
+    ReaderActivityItem,
+    RowUpsert,
+    SerializableDict,
+    SerializableNamespaceDict,
+    TimeSeries,
+)
 
 
 class EventSeriesType(Enum):

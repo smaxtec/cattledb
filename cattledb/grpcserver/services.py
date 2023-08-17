@@ -2,13 +2,28 @@ import grpc
 import pendulum
 from pendulum.parsing.exceptions import ParserError
 
-from ..storage.models import (EventList, MetaDataItem,
-                              SerializableNamespaceDict, TimeSeries)
-from .cdb_pb2 import (ActivityResponse, DeleteResult, DeviceActivityResponse,
-                      EventSeries, FloatTimeSeries, FloatTimeSeriesList,
-                      MetaDataResponse, PutResult)
-from .cdb_pb2_grpc import (ActivityServicer, EventsServicer, MetaDataServicer,
-                           TimeSeriesServicer)
+from ..storage.models import (
+    EventList,
+    MetaDataItem,
+    SerializableNamespaceDict,
+    TimeSeries,
+)
+from .cdb_pb2 import (
+    ActivityResponse,
+    DeleteResult,
+    DeviceActivityResponse,
+    EventSeries,
+    FloatTimeSeries,
+    FloatTimeSeriesList,
+    MetaDataResponse,
+    PutResult,
+)
+from .cdb_pb2_grpc import (
+    ActivityServicer,
+    EventsServicer,
+    MetaDataServicer,
+    TimeSeriesServicer,
+)
 
 
 class TimeSeriesServicer(TimeSeriesServicer):

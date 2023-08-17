@@ -5,21 +5,34 @@ import json
 import logging
 import struct
 import time
-from collections import defaultdict, namedtuple
+from collections import defaultdict
 
 from blinker import signal
 from google.cloud import bigtable
 from google.cloud.bigtable.column_family import MaxVersionsGCRule
 from google.cloud.bigtable.row_filters import CellsColumnLimitFilter
 
-from ..core.helper import (daily_timestamps, from_ts, get_event_name_lookup,
-                           get_metric_id_lookup, get_metric_ids,
-                           get_metric_name_lookup, get_metric_names,
-                           monthly_timestamps)
+from ..core.helper import (
+    daily_timestamps,
+    from_ts,
+    get_event_name_lookup,
+    get_metric_id_lookup,
+    get_metric_ids,
+    get_metric_name_lookup,
+    get_metric_names,
+    monthly_timestamps,
+)
 from ..grpcserver.cdb_pb2 import FloatTimeSeries, FloatTimeSeriesList
-from .models import (DeviceActivityItem, EventList, EventSeriesType,
-                     MetaDataItem, ReaderActivityItem, RowUpsert,
-                     SerializableDict, TimeSeries)
+from .models import (
+    DeviceActivityItem,
+    EventList,
+    EventSeriesType,
+    MetaDataItem,
+    ReaderActivityItem,
+    RowUpsert,
+    SerializableDict,
+    TimeSeries,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -109,7 +122,6 @@ class MetaDataStore(object):
 
         for row_key, data_dict in gen:
             o_name, o_id = row_key.split("#")
-            d = dict()
             for k, value in data_dict.items():
                 s = k.split(":")
                 if len(s) != 2:
@@ -336,7 +348,6 @@ class ActivityStore(object):
         timer = time.time()
 
         activitys = defaultdict(lambda: defaultdict(list))
-        row_counter = 0
         row_keys = []
 
         # Start scanning
@@ -901,7 +912,7 @@ class EventStore(object):
                 s = k.split(":")
                 if len(s) != 2:
                     continue
-                m = s[0]
+                s[0]
                 ts = int(s[1])
                 events.insert_storage_item(ts, value)
 
@@ -959,7 +970,7 @@ class EventStore(object):
                 s = key.split(":")
                 if len(s) != 2:
                     continue
-                m = s[0]
+                s[0]
                 ts = int(s[1])
                 events.insert_storage_item(ts, value)
 
