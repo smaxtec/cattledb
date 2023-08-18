@@ -1,0 +1,165 @@
+## master
+
+============================ test session starts =============================
+platform linux -- Python 3.10.12, pytest-7.4.0, pluggy-1.2.0
+rootdir: /home/mathym/Development/work/cattledb
+collected 49 items
+
+tests/test_activitystore.py .                                          [  2%]
+tests/test_asyncclient.py .                                            [  4%]
+tests/test_connection.py ..                                            [  8%]
+tests/test_coremodels.py ...                                           [ 14%]
+tests/test_ctimeseries.py FFFFFFF                                      [ 28%]
+tests/test_directclient.py ....F                                       [ 38%]
+tests/test_eventstore.py ..                                            [ 42%]
+tests/test_localsql.py ...                                             [ 48%]
+tests/test_metadatastore.py .                                          [ 51%]
+tests/test_models.py ...........                                       [ 73%]
+tests/test_pytimeseries.py .......                                     [ 87%]
+tests/test_timeseriesstore.py ..F..F                                   [100%]
+
+================================== FAILURES ==================================
+
+========================== short test summary info ===========================
+FAILED tests/test_ctimeseries.py::CTimeSeriesTest::test_base - TypeError: 'NoneType' object is not callable
+FAILED tests/test_ctimeseries.py::CTimeSeriesTest::test_canada - TypeError: 'NoneType' object is not callable
+FAILED tests/test_ctimeseries.py::CTimeSeriesTest::test_index - TypeError: 'NoneType' object is not callable
+FAILED tests/test_ctimeseries.py::CTimeSeriesTest::test_timezone - TypeError:'NoneType' object is not callable
+FAILED tests/test_ctimeseries.py::CTimeSeriesTest::test_trim - TypeError: 'NoneType' object is not callable
+FAILED tests/test_ctimeseries.py::CTimeSeriesTest::test_trim_exact - TypeError: 'NoneType' object is not callable
+FAILED tests/test_ctimeseries.py::CTimeSeriesTest::test_vienna - TypeError: 'NoneType' object is not callable
+FAILED tests/test_directclient.py::DirectclientTests::test_timeseries - AssertionError: 1 != 70
+FAILED tests/test_timeseriesstore.py::TimeSeriesStorageTest::test_large - AssertionError: 87 != 5000
+FAILED tests/test_timeseriesstore.py::TimeSeriesStorageTest::test_simple - AssertionError: 128 != 502
+================= 10 failed, 39 passed, 53 warnings in 2.55s =================
+
+
+## Without formatting
+
+============================ test session starts =============================
+platform linux -- Python 3.10.12, pytest-7.4.0, pluggy-1.2.0
+rootdir: /home/mathym/Development/work/cattledb
+collected 49 items
+
+tests/test_activitystore.py .                                          [  2%]
+tests/test_asyncclient.py .                                            [  4%]
+tests/test_connection.py ..                                            [  8%]
+tests/test_coremodels.py ...                                           [ 14%]
+tests/test_ctimeseries.py FFFFFFF                                      [ 28%]
+tests/test_directclient.py ....F                                       [ 38%]
+tests/test_eventstore.py ..                                            [ 42%]
+tests/test_localsql.py ...                                             [ 48%]
+tests/test_metadatastore.py .                                          [ 51%]
+tests/test_models.py ...........                                       [ 73%]
+tests/test_pytimeseries.py .......                                     [ 87%]
+tests/test_timeseriesstore.py ..F..F                                   [100%]
+
+================================== FAILURES ==================================
+
+========================== short test summary info ===========================
+FAILED tests/test_ctimeseries.py::CTimeSeriesTest::test_base - TypeError: 'NoneType' object is not callable
+FAILED tests/test_ctimeseries.py::CTimeSeriesTest::test_canada - TypeError: 'NoneType' object is not callable
+FAILED tests/test_ctimeseries.py::CTimeSeriesTest::test_index - TypeError: 'NoneType' object is not callable
+FAILED tests/test_ctimeseries.py::CTimeSeriesTest::test_timezone - TypeError:'NoneType' object is not callable
+FAILED tests/test_ctimeseries.py::CTimeSeriesTest::test_trim - TypeError: 'NoneType' object is not callable
+FAILED tests/test_ctimeseries.py::CTimeSeriesTest::test_trim_exact - TypeError: 'NoneType' object is not callable
+FAILED tests/test_ctimeseries.py::CTimeSeriesTest::test_vienna - TypeError: 'NoneType' object is not callable
+FAILED tests/test_directclient.py::DirectclientTests::test_timeseries - AssertionError: 0 != 70
+FAILED tests/test_timeseriesstore.py::TimeSeriesStorageTest::test_large - AssertionError: 52 != 5000
+FAILED tests/test_timeseriesstore.py::TimeSeriesStorageTest::test_simple - AssertionError: 126 != 502
+================ 10 failed, 39 passed, 53 warnings in 12.81s =================
+
+
+## After formatting with `black`
+
+============================ test session starts =============================
+platform linux -- Python 3.10.12, pytest-7.4.0, pluggy-1.2.0
+rootdir: /home/mathym/Development/work/cattledb
+collected 49 items
+
+tests/test_activitystore.py .                                          [  2%]
+tests/test_asyncclient.py .                                            [  4%]
+tests/test_connection.py ..                                            [  8%]
+tests/test_coremodels.py ...                                           [ 14%]
+tests/test_ctimeseries.py FFFFFFF                                      [ 28%]
+tests/test_directclient.py ....F                                       [ 38%]
+tests/test_eventstore.py ..                                            [ 42%]
+tests/test_localsql.py ...                                             [ 48%]
+tests/test_metadatastore.py .                                          [ 51%]
+tests/test_models.py ...........                                       [ 73%]
+tests/test_pytimeseries.py .......                                     [ 87%]
+tests/test_timeseriesstore.py ..F..F                                   [100%]
+
+================================== FAILURES ==================================
+
+========================== short test summary info ===========================
+FAILED tests/test_ctimeseries.py::CTimeSeriesTest::test_base - TypeError: 'NoneType' object is not callable
+FAILED tests/test_ctimeseries.py::CTimeSeriesTest::test_canada - TypeError: 'NoneType' object is not callable
+FAILED tests/test_ctimeseries.py::CTimeSeriesTest::test_index - TypeError: 'NoneType' object is not callable
+FAILED tests/test_ctimeseries.py::CTimeSeriesTest::test_timezone - TypeError:'NoneType' object is not callable
+FAILED tests/test_ctimeseries.py::CTimeSeriesTest::test_trim - TypeError: 'NoneType' object is not callable
+FAILED tests/test_ctimeseries.py::CTimeSeriesTest::test_trim_exact - TypeError: 'NoneType' object is not callable
+FAILED tests/test_ctimeseries.py::CTimeSeriesTest::test_vienna - TypeError: 'NoneType' object is not callable
+FAILED tests/test_directclient.py::DirectclientTests::test_timeseries - AssertionError: 3 != 70
+FAILED tests/test_timeseriesstore.py::TimeSeriesStorageTest::test_large - AssertionError: 73 != 5000
+FAILED tests/test_timeseriesstore.py::TimeSeriesStorageTest::test_simple - AssertionError: 125 != 502
+================= 10 failed, 39 passed, 53 warnings in 2.66s =================
+
+
+## After running `isort`
+
+============================ test session starts =============================
+platform linux -- Python 3.10.12, pytest-7.4.0, pluggy-1.2.0
+rootdir: /home/mathym/Development/work/cattledb
+collected 49 items
+
+tests/test_activitystore.py .                                          [  2%]
+tests/test_asyncclient.py .                                            [  4%]
+tests/test_connection.py ..                                            [  8%]
+tests/test_coremodels.py ...                                           [ 14%]
+tests/test_ctimeseries.py FFFFFFF                                      [ 28%]
+tests/test_directclient.py ....F                                       [ 38%]
+tests/test_eventstore.py ..                                            [ 42%]
+tests/test_localsql.py ...                                             [ 48%]
+tests/test_metadatastore.py .                                          [ 51%]
+tests/test_models.py ...........                                       [ 73%]
+tests/test_pytimeseries.py .......                                     [ 87%]
+tests/test_timeseriesstore.py ..F..F                                   [100%]
+
+================================== FAILURES ==================================
+
+========================== short test summary info ===========================
+FAILED tests/test_ctimeseries.py::CTimeSeriesTest::test_base - TypeError: 'NoneType' object is not callable
+FAILED tests/test_ctimeseries.py::CTimeSeriesTest::test_canada - TypeError: 'NoneType' object is not callable
+FAILED tests/test_ctimeseries.py::CTimeSeriesTest::test_index - TypeError: 'NoneType' object is not callable
+FAILED tests/test_ctimeseries.py::CTimeSeriesTest::test_timezone - TypeError:'NoneType' object is not callable
+FAILED tests/test_ctimeseries.py::CTimeSeriesTest::test_trim - TypeError: 'NoneType' object is not callable
+FAILED tests/test_ctimeseries.py::CTimeSeriesTest::test_trim_exact - TypeError: 'NoneType' object is not callable
+FAILED tests/test_ctimeseries.py::CTimeSeriesTest::test_vienna - TypeError: 'NoneType' object is not callable
+FAILED tests/test_directclient.py::DirectclientTests::test_timeseries - AssertionError: 0 != 70
+FAILED tests/test_timeseriesstore.py::TimeSeriesStorageTest::test_large - AssertionError: 82 != 5000
+FAILED tests/test_timeseriesstore.py::TimeSeriesStorageTest::test_simple - AssertionError: 126 != 502
+================= 10 failed, 39 passed, 53 warnings in 2.68s =================
+
+## Python 3.10 - after recompiling protobuf files with Python 3.10
+
+========== 24 failed, 25 passed, 51 warnings in 1028.74s (0:17:08) ===========
+
+## After fix of function
+
+================= 24 failed, 25 passed, 17 warnings in 1.10s =================
+
+## With bigtable-emulator running
+
+========================== short test summary info ===========================
+FAILED tests/test_ctimeseries.py::CTimeSeriesTest::test_base - TypeError: 'NoneType' object is not callable
+FAILED tests/test_ctimeseries.py::CTimeSeriesTest::test_canada - TypeError: 'NoneType' object is not callable
+FAILED tests/test_ctimeseries.py::CTimeSeriesTest::test_index - TypeError: 'NoneType' object is not callable
+FAILED tests/test_ctimeseries.py::CTimeSeriesTest::test_timezone - TypeError:'NoneType' object is not callable
+FAILED tests/test_ctimeseries.py::CTimeSeriesTest::test_trim - TypeError: 'NoneType' object is not callable
+FAILED tests/test_ctimeseries.py::CTimeSeriesTest::test_trim_exact - TypeError: 'NoneType' object is not callable
+FAILED tests/test_ctimeseries.py::CTimeSeriesTest::test_vienna - TypeError: 'NoneType' object is not callable
+FAILED tests/test_directclient.py::DirectclientTests::test_timeseries - AssertionError: 2 != 70
+FAILED tests/test_timeseriesstore.py::TimeSeriesStorageTest::test_large - AssertionError: 60 != 5000
+FAILED tests/test_timeseriesstore.py::TimeSeriesStorageTest::test_simple - AssertionError: 125 != 502
+================ 10 failed, 39 passed, 17 warnings in 12.92s =================
