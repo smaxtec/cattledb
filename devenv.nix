@@ -19,7 +19,10 @@
     poetry = {
       enable = true;
       activate.enable = true;
-      install.enable = true;
+      install = {
+        enable = true;
+        groups = [ "test" "protoc" ];
+      };
     };
   };
 
@@ -33,5 +36,24 @@
       autoflake.flags = "--in-place --remove-unused-variables --ignore-init-module-imports";
       # --remove-all-unused-imports";
     };
+  };
+
+  env = {
+    "BIGTABLE_EMULATOR_HOST" = "localhost:8080";
+  };
+
+  scripts = {
+    run-cattledb-tests.exec = ''
+      docker run -d --rm -p 8080:8080 --name=bigtable-emulator spotify/bigtable-emulator:latest
+      pytest tests -vv
+      docker stop bigtable-emulator
+    '';
+    build-cattledb-container.exec = ''
+      docker build . -t cattledb-test
+    '';
+    compile-protobuf-files.exec = ''
+      python -m grpc.tools.protoc --python_out=./cattledb/grpcserver --grpc_python_out=./cattledb/grpcserver --proto_path=./protos cdb.proto
+      sed -i "s/import cdb_pb2 as cdb__pb2/from . import cdb_pb2 as cdb__pb2/g" cattledb/grpcserver/cdb_pb2_grpc.py
+    '';
   };
 }
