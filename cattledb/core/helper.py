@@ -1,12 +1,13 @@
 #!/usr/bin/python
 # coding: utf-8
 
-import datetime
-import time
 import calendar
-import pendulum
+import datetime
 import logging
 import logging.config
+import time
+
+import pendulum
 
 
 def to_ts(dt):
@@ -28,35 +29,47 @@ def from_ts(ts):
 
 def trim_timetuple(time_tuple, trim):
     if trim == "minute":
-        return time.struct_time((time_tuple.tm_year,
-                                 time_tuple.tm_mon,
-                                 time_tuple.tm_mday,
-                                 time_tuple.tm_hour,
-                                 time_tuple.tm_min,
-                                 0,  # time_tuple.tm_sec,
-                                 time_tuple.tm_wday,
-                                 time_tuple.tm_yday,
-                                 time_tuple.tm_isdst))
+        return time.struct_time(
+            (
+                time_tuple.tm_year,
+                time_tuple.tm_mon,
+                time_tuple.tm_mday,
+                time_tuple.tm_hour,
+                time_tuple.tm_min,
+                0,  # time_tuple.tm_sec,
+                time_tuple.tm_wday,
+                time_tuple.tm_yday,
+                time_tuple.tm_isdst,
+            )
+        )
     elif trim == "hour":
-        return time.struct_time((time_tuple.tm_year,
-                                 time_tuple.tm_mon,
-                                 time_tuple.tm_mday,
-                                 time_tuple.tm_hour,
-                                 0,  # time_tuple.tm_min,
-                                 0,  # time_tuple.tm_sec,
-                                 time_tuple.tm_wday,
-                                 time_tuple.tm_yday,
-                                 time_tuple.tm_isdst))
+        return time.struct_time(
+            (
+                time_tuple.tm_year,
+                time_tuple.tm_mon,
+                time_tuple.tm_mday,
+                time_tuple.tm_hour,
+                0,  # time_tuple.tm_min,
+                0,  # time_tuple.tm_sec,
+                time_tuple.tm_wday,
+                time_tuple.tm_yday,
+                time_tuple.tm_isdst,
+            )
+        )
     elif trim == "day":
-        return time.struct_time((time_tuple.tm_year,
-                                 time_tuple.tm_mon,
-                                 time_tuple.tm_mday,
-                                 0,  # time_tuple.tm_hour,
-                                 0,  # time_tuple.tm_min,
-                                 0,  # time_tuple.tm_sec,
-                                 time_tuple.tm_wday,
-                                 time_tuple.tm_yday,
-                                 time_tuple.tm_isdst))
+        return time.struct_time(
+            (
+                time_tuple.tm_year,
+                time_tuple.tm_mon,
+                time_tuple.tm_mday,
+                0,  # time_tuple.tm_hour,
+                0,  # time_tuple.tm_min,
+                0,  # time_tuple.tm_sec,
+                time_tuple.tm_wday,
+                time_tuple.tm_yday,
+                time_tuple.tm_isdst,
+            )
+        )
     elif trim == "week":
         day_in_week = time_tuple.tm_wday
         tt = trim_timetuple(time_tuple, "day")
@@ -138,7 +151,7 @@ def daily_timestamps_pendulum(from_ts, to_ts):
     assert from_ts <= to_ts
     from_dt = pendulum.from_timestamp(from_ts)
     to_dt = pendulum.from_timestamp(to_ts)
-    cur = from_dt.start_of('day')
+    cur = from_dt.start_of("day")
     while cur <= to_dt:
         yield cur.int_timestamp
         cur = cur.add(days=1)
@@ -151,14 +164,16 @@ def daily_timestamps(from_ts, to_ts):
     last = first
     while last <= to_ts:
         yield last
-        last = ts_daily_left(last + 25*60*60)  # Add 1 hour for correct behaviour at diffs
+        last = ts_daily_left(
+            last + 25 * 60 * 60
+        )  # Add 1 hour for correct behaviour at diffs
 
 
 def monthly_timestamps_pendulum(from_ts, to_ts):
     assert from_ts <= to_ts
     from_dt = pendulum.from_timestamp(from_ts)
     to_dt = pendulum.from_timestamp(to_ts)
-    cur = from_dt.start_of('month')
+    cur = from_dt.start_of("month")
     while cur <= to_dt:
         yield cur.int_timestamp
         cur = cur.add(months=1)
@@ -171,25 +186,21 @@ def monthly_timestamps(from_ts, to_ts):
     last = first
     while last <= to_ts:
         yield last
-        last = ts_monthly_left(last + 32*24*60*60)  # Add 1 day hour for correct behaviour at diffs
+        last = ts_monthly_left(
+            last + 32 * 24 * 60 * 60
+        )  # Add 1 day hour for correct behaviour at diffs
 
 
 def get_metric_name_lookup(metrics):
-    return {
-        m.name: m for m in metrics
-    }
+    return {m.name: m for m in metrics}
 
 
 def get_event_name_lookup(events):
-    return {
-        e.name: e for e in events
-    }
+    return {e.name: e for e in events}
 
 
 def get_metric_id_lookup(metrics):
-    return {
-        m.id: m for m in metrics
-    }
+    return {m.id: m for m in metrics}
 
 
 def get_metric_names(metrics):
@@ -227,6 +238,7 @@ def merge_lists_on_key(a, b, key):
 
 def import_config_file(filepath):
     import importlib.util
+
     spec = importlib.util.spec_from_file_location("current_config", filepath)
     foo = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(foo)

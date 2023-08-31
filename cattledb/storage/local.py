@@ -1,12 +1,11 @@
 #!/usr/bin/python
 # coding: utf-8
 
-import pathlib
-import logging
 import csv
+import logging
+import pathlib
 
-
-from ..core.models import FastFloatTimeseries, FastDictTimeseries
+from ..core.models import FastDictTimeseries, FastFloatTimeseries
 
 logger = logging.getLogger(__name__)
 
@@ -61,7 +60,7 @@ class LocalFileStore(object):
         data = self.get_timeseries(key)
         old_metrics = data.columns or []
         metrics = set(old_metrics)
-        
+
         checked_dict = {}
         for k, v in value_dict.items():
             checked_dict[k] = float(v)

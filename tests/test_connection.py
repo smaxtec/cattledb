@@ -1,17 +1,15 @@
 #!/usr/bin/python
 # coding: utf-8
 
-import unittest
-import random
 import logging
-import pendulum
-import os
-import datetime
+import unittest
 
+import pendulum
 
 from cattledb.storage.connection import Connection
 from cattledb.storage.models import RowUpsert
-from .helper import get_unit_test_config, get_test_connection
+
+from .helper import get_test_connection, get_unit_test_config
 
 
 class ConnectionTest(unittest.TestCase):
@@ -71,7 +69,9 @@ class ConnectionTest(unittest.TestCase):
         self.assertIn("p:k", res[1][1])
         self.assertNotIn("i:k", res[1][1])
 
-        res = table.read_rows(row_keys=["abc#2#1", "abc#3#1"], column_families=["p", "i"])
+        res = table.read_rows(
+            row_keys=["abc#2#1", "abc#3#1"], column_families=["p", "i"]
+        )
         self.assertEqual(len(res), 2)
         self.assertIn("p:k", res[0][1])
         self.assertIn("i:k", res[0][1])
@@ -96,5 +96,7 @@ class ConnectionTest(unittest.TestCase):
         res = table.read_rows(start_key="abc#2", end_key="abc#3#2")
         self.assertEqual(len(res), 5)
 
-        res = table.read_rows(start_key="abc#2", end_key="abc#3#2", column_families=["i"])
+        res = table.read_rows(
+            start_key="abc#2", end_key="abc#3#2", column_families=["i"]
+        )
         self.assertEqual(len(res), 3)

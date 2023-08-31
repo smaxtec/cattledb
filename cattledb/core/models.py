@@ -3,30 +3,43 @@
 
 import abc
 import hashlib
-import pendulum
-import struct
-import msgpack
 import json
-
+import struct
+from collections import defaultdict, namedtuple
 from enum import Enum
-from collections import namedtuple, defaultdict
-from statistics import stdev, mean, median
+from statistics import mean, median, stdev
 
-from .helper import ts_daily_left, ts_daily_right
-from .helper import ts_monthly_left, ts_monthly_right
-from .helper import ts_hourly_left, ts_hourly_right
-from .helper import list_mean
+import msgpack
+import pendulum
+
+from ..grpcserver.cdb_pb2 import (
+    DeviceActivity,
+    Dictionary,
+    DictTimeSeries,
+    EventSeries,
+    FloatTimeSeries,
+    MetaDataDict,
+    Pair,
+    ReaderActivity,
+)
 from ._timeseries import FloatTSList, PyTSList
+from .helper import (
+    list_mean,
+    ts_daily_left,
+    ts_daily_right,
+    ts_hourly_left,
+    ts_hourly_right,
+    ts_monthly_left,
+    ts_monthly_right,
+)
 
-
-from ..grpcserver.cdb_pb2 import FloatTimeSeries, Dictionary, DictTimeSeries, Pair, MetaDataDict, ReaderActivity, DeviceActivity, EventSeries
-
-
-Point = namedtuple('Point', ['ts', 'value', 'dt'])
-RawPoint = namedtuple('RawPoint', ['ts', 'value', 'ts_offset'])
-MetaDataItem = namedtuple('MetaDataItem', ["object_name", "object_id", "key", "data"])
-_AggregationValue = namedtuple("AggregationValue", ["count", "sum", "min", "max", "mean", "stdev", "median"])
-RowUpsert = namedtuple('RowUpsert', ['row_key', 'cells'])
+Point = namedtuple("Point", ["ts", "value", "dt"])
+RawPoint = namedtuple("RawPoint", ["ts", "value", "ts_offset"])
+MetaDataItem = namedtuple("MetaDataItem", ["object_name", "object_id", "key", "data"])
+_AggregationValue = namedtuple(
+    "AggregationValue", ["count", "sum", "min", "max", "mean", "stdev", "median"]
+)
+RowUpsert = namedtuple("RowUpsert", ["row_key", "cells"])
 
 
 class MetricType(Enum):
@@ -40,7 +53,9 @@ class EventSeriesType(Enum):
 
 
 class MetricDefinition(object):
-    def __init__(self, name, id, type, delete_possible, _deprecated1=None, _deprecated2=None):
+    def __init__(
+        self, name, id, type, delete_possible, _deprecated1=None, _deprecated2=None
+    ):
         self.name = name
         self.id = id
         self.type = type
@@ -56,10 +71,10 @@ class MetricDefinition(object):
 
     def to_dict(self):
         return {
-            'name': self.name,
-            'id': self.id,
-            'type': self.type.value,
-            'delete_possible': self.delete_possible
+            "name": self.name,
+            "id": self.id,
+            "type": self.type.value,
+            "delete_possible": self.delete_possible,
         }
 
     def __repr__(self):
@@ -78,10 +93,7 @@ class EventDefinition(object):
         return cls(name, t)
 
     def to_dict(self):
-        return {
-            'name': self.name,
-            'type': self.type.value
-        }
+        return {"name": self.name, "type": self.type.value}
 
     def __repr__(self):
         return "Event: {} (type={})".format(self.name, self.type)
@@ -97,9 +109,14 @@ def full_aggregation(x):
         return AggregationValue(len(x), 0, 0, 0, 0, 0, 0)
 
     return AggregationValue(
-        count=len(x), sum=sum(x), min=min(x),
-        max=max(x), mean=mean(x), stdev=stdev(x),
-        median=median(x))
+        count=len(x),
+        sum=sum(x),
+        min=min(x),
+        max=max(x),
+        mean=mean(x),
+        stdev=stdev(x),
+        median=median(x),
+    )
 
 
 class BaseTimeseries(object, metaclass=abc.ABCMeta):
@@ -119,8 +136,9 @@ class BaseTimeseries(object, metaclass=abc.ABCMeta):
         self.metric = m.lower()
 
     def to_hash(self):
-        s = "{}.{}.{}.{}.{}".format(self.key, self.metric, len(self),
-                                    self.ts_min, self.ts_max)
+        s = "{}.{}.{}.{}.{}".format(
+            self.key, self.metric, len(self), self.ts_min, self.ts_max
+        )
         return hashlib.sha1(s.encode("utf-8")).hexdigest()
 
     def __eq__(self, other):
@@ -136,14 +154,13 @@ class BaseTimeseries(object, metaclass=abc.ABCMeta):
             m = self._data.at_index(0)[0]
         else:
             m = -1
-        return "<{}.{} series({}), min_ts: {}>".format(
-            self.key, self.metric, l, m)
+        return "<{}.{} series({}), min_ts: {}>".format(self.key, self.metric, l, m)
 
     @property
     def ts_max(self):
         if self.empty():
             return None
-        return self._raw_at(len(self)-1)[0]
+        return self._raw_at(len(self) - 1)[0]
 
     @property
     def ts_min(self):
@@ -160,7 +177,7 @@ class BaseTimeseries(object, metaclass=abc.ABCMeta):
 
     @property
     def last(self):
-        return None if self.empty() else self._rawpoint_at(len(self)-1)
+        return None if self.empty() else self._rawpoint_at(len(self) - 1)
 
     def _at(self, index, raw=False):
         if raw:
@@ -182,7 +199,7 @@ class BaseTimeseries(object, metaclass=abc.ABCMeta):
         if index < 0 or index >= len(self):
             raise IndexError
         ts, ts_offset, value = self._data.at_index(index)
-        dt = pendulum.from_timestamp(ts, ts_offset/3600.0)
+        dt = pendulum.from_timestamp(ts, ts_offset / 3600.0)
         return Point(ts=ts, value=value, dt=dt)
 
     def _serializable_at(self, index):
@@ -206,28 +223,26 @@ class BaseTimeseries(object, metaclass=abc.ABCMeta):
     def trim_count_newest(self, count):
         if count >= len(self):
             return self
-        max_idx = len(self)-1
-        min_idx = max_idx-(count-1)
+        max_idx = len(self) - 1
+        min_idx = max_idx - (count - 1)
         return self._data.trim_index(min_idx, max_idx)
 
     def trim_count_oldest(self, count):
         if count >= len(self):
             return self
-        max_idx = count-1
+        max_idx = count - 1
         min_idx = 0
         return self._data.trim_index(min_idx, max_idx)
 
     def all(self, raw=False):
-        """Return an iterator to get all ts value pairs.
-        """
+        """Return an iterator to get all ts value pairs."""
         i = 0
         while i < len(self):
             yield self._at(i, raw=raw)
             i += 1
 
     def yield_range(self, ts_min, ts_max, raw=False):
-        """Return an iterator to get all ts value pairs in range.
-        """
+        """Return an iterator to get all ts value pairs in range."""
         low = self._data.bisect_left(ts_min)
         high = self._data.bisect_right(ts_max)
 
@@ -245,8 +260,10 @@ class BaseTimeseries(object, metaclass=abc.ABCMeta):
             j = 0
             lower_bound = ts_daily_left(self._data.at_index(i)[0])
             upper_bound = ts_daily_right(self._data.at_index(i)[0])
-            while (i + j < len(self) and
-                   lower_bound <= self._data.at_index(i + j)[0] <= upper_bound):
+            while (
+                i + j < len(self)
+                and lower_bound <= self._data.at_index(i + j)[0] <= upper_bound
+            ):
                 j += 1
             yield (self._at(x, raw=raw) for x in range(i, i + j))
             i += j
@@ -257,8 +274,10 @@ class BaseTimeseries(object, metaclass=abc.ABCMeta):
             j = 0
             lower_bound = ts_monthly_left(self._data.at_index(i)[0])
             upper_bound = ts_monthly_right(self._data.at_index(i)[0])
-            while (i + j < len(self) and
-                   lower_bound <= self._data.at_index(i + j)[0] <= upper_bound):
+            while (
+                i + j < len(self)
+                and lower_bound <= self._data.at_index(i + j)[0] <= upper_bound
+            ):
                 j += 1
             yield (lower_bound, [self._storage_item_at(x) for x in range(i, i + j)])
             i += j
@@ -269,29 +288,36 @@ class BaseTimeseries(object, metaclass=abc.ABCMeta):
             j = 0
             lower_bound = ts_daily_left(self._data.at_index(i)[0])
             upper_bound = ts_daily_right(self._data.at_index(i)[0])
-            while (i + j < len(self) and
-                   lower_bound <= self._data.at_index(i + j)[0] <= upper_bound):
+            while (
+                i + j < len(self)
+                and lower_bound <= self._data.at_index(i + j)[0] <= upper_bound
+            ):
                 j += 1
             yield (lower_bound, [self._storage_item_at(x) for x in range(i, i + j)])
             i += j
 
-    def get_serializable_iterator(self, timestamp_format, aggregation_span=None, aggregation_type=None):
+    def get_serializable_iterator(
+        self, timestamp_format, aggregation_span=None, aggregation_type=None
+    ):
         """
         Possible formats: utc, local, iso, tuple, dt
         Aggregation Spans: hourly, daily, 10min
         Aggregation Types: mean, count, sum, min, max, all
         """
-        data = []
         if timestamp_format == "utc":
             timestamp_func = lambda x: x.ts
         elif timestamp_format == "local":
             timestamp_func = lambda x: x.ts + x.ts_offset
         elif timestamp_format == "iso":
-            timestamp_func = lambda x: pendulum.from_timestamp(x.ts, x.ts_offset/3600.0).isoformat()
+            timestamp_func = lambda x: pendulum.from_timestamp(
+                x.ts, x.ts_offset / 3600.0
+            ).isoformat()
         elif timestamp_format == "tuple":
             timestamp_func = lambda x: (x.ts, x.ts_offset)
         elif timestamp_format == "dt":
-            timestamp_func = lambda x: pendulum.from_timestamp(x.ts, x.ts_offset/3600.0)
+            timestamp_func = lambda x: pendulum.from_timestamp(
+                x.ts, x.ts_offset / 3600.0
+            )
         else:
             raise ValueError("invalid timestamp format")
         if aggregation_span and aggregation_type:
@@ -311,10 +337,14 @@ class BaseTimeseries(object, metaclass=abc.ABCMeta):
         i = 0
         while i < len(self):
             j = 0
-            lower_bound = self._data.at_index(i)[0] - (self._data.at_index(i)[0] % (10*60))
-            upper_bound = lower_bound + 10*60 - 1
-            while (i + j < len(self) and
-                   lower_bound <= self._data.at_index(i + j)[0] <= upper_bound):
+            lower_bound = self._data.at_index(i)[0] - (
+                self._data.at_index(i)[0] % (10 * 60)
+            )
+            upper_bound = lower_bound + 10 * 60 - 1
+            while (
+                i + j < len(self)
+                and lower_bound <= self._data.at_index(i + j)[0] <= upper_bound
+            ):
                 j += 1
             yield (self._at(x, raw=raw) for x in range(i, i + j))
             i += j
@@ -328,8 +358,10 @@ class BaseTimeseries(object, metaclass=abc.ABCMeta):
             j = 0
             lower_bound = ts_hourly_left(self._data.at_index(i)[0])
             upper_bound = ts_hourly_right(self._data.at_index(i)[0])
-            while (i + j < len(self) and
-                   lower_bound <= self._data.at_index(i + j)[0] <= upper_bound):
+            while (
+                i + j < len(self)
+                and lower_bound <= self._data.at_index(i + j)[0] <= upper_bound
+            ):
                 j += 1
             yield (self._at(x, raw=raw) for x in range(i, i + j))
             i += j
@@ -341,10 +373,17 @@ class BaseTimeseries(object, metaclass=abc.ABCMeta):
         i = 0
         while i < len(self):
             j = 0
-            lower_bound = ts_hourly_left(self._data.at_index(i)[0] + self._data.at_index(i)[1])
-            upper_bound = ts_hourly_right(self._data.at_index(i)[0] + self._data.at_index(i)[1])
-            while (i + j < len(self) and
-                   (self._data.at_index(i + j)[0] + self._data.at_index(i + j)[1]) <= upper_bound):
+            lower_bound = ts_hourly_left(
+                self._data.at_index(i)[0] + self._data.at_index(i)[1]
+            )
+            upper_bound = ts_hourly_right(
+                self._data.at_index(i)[0] + self._data.at_index(i)[1]
+            )
+            while (
+                i + j < len(self)
+                and (self._data.at_index(i + j)[0] + self._data.at_index(i + j)[1])
+                <= upper_bound
+            ):
                 j += 1
             yield (self._at(x, raw=raw) for x in range(i, i + j))
             i += j
@@ -356,18 +395,23 @@ class BaseTimeseries(object, metaclass=abc.ABCMeta):
         i = 0
         while i < len(self):
             j = 0
-            lower_bound = ts_daily_left(self._data.at_index(i)[0] + self._data.at_index(i)[1])
-            upper_bound = ts_daily_right(self._data.at_index(i)[0] + self._data.at_index(i)[1])
-            while (i + j < len(self) and
-                   (self._data.at_index(i + j)[0] + self._data.at_index(i + j)[1]) <= upper_bound):
+            lower_bound = ts_daily_left(
+                self._data.at_index(i)[0] + self._data.at_index(i)[1]
+            )
+            upper_bound = ts_daily_right(
+                self._data.at_index(i)[0] + self._data.at_index(i)[1]
+            )
+            while (
+                i + j < len(self)
+                and (self._data.at_index(i + j)[0] + self._data.at_index(i + j)[1])
+                <= upper_bound
+            ):
                 j += 1
             yield (self._at(x, raw=raw) for x in range(i, i + j))
             i += j
 
-    def aggregation(self, group="hourly", function="mean", raw=False,
-                    tz_mode="utc"):
-        """Aggregation Generator.
-        """
+    def aggregation(self, group="hourly", function="mean", raw=False, tz_mode="utc"):
+        """Aggregation Generator."""
         assert tz_mode in ["utc", "local"]
 
         if group == "hourly":
@@ -384,7 +428,7 @@ class BaseTimeseries(object, metaclass=abc.ABCMeta):
             left = ts_daily_left
         elif group == "10min":
             it = self.aligned_10minute
-            left = lambda x: x - (x % (10*60))
+            left = lambda x: x - (x % (10 * 60))
         else:
             raise ValueError("Invalid aggregation group")
 
@@ -397,8 +441,10 @@ class BaseTimeseries(object, metaclass=abc.ABCMeta):
         elif function == "max":
             func = max
         elif function == "amp":
+
             def amp(x):
                 return max(x) - min(x)
+
             func = amp
         elif function == "mean":
             func = list_mean
@@ -425,7 +471,7 @@ class BaseTimeseries(object, metaclass=abc.ABCMeta):
                 else:
                     ts = left(t[0].ts)
                 offset = t[0].ts_offset
-                dt = pendulum.from_timestamp(ts, offset/3600.0)
+                dt = pendulum.from_timestamp(ts, offset / 3600.0)
                 value = func([x.value for x in t])
                 yield Point(ts, value, dt)
 
@@ -516,7 +562,11 @@ class FastDictTimeseries(BaseTimeseries):
     def _storage_item_at(self, index):
         assert 0 <= index < len(self)
         item = self._data.at_index(index)
-        by = struct.pack("B", 2) + struct.pack("i", item[1]) + msgpack.packb(item[2], use_bin_type=True)
+        by = (
+            struct.pack("B", 2)
+            + struct.pack("i", item[1])
+            + msgpack.packb(item[2], use_bin_type=True)
+        )
         return (item[0], by)
 
     def insert_storage_item(self, timestamp, by):
@@ -536,7 +586,9 @@ class FastDictTimeseries(BaseTimeseries):
     def from_proto(cls, p):
         i = cls(p.key, p.metric)
         parsed_values = [SerializableDict.from_proto(x) for x in p.values]
-        for ts, ts_offset, value in zip(p.timestamps, p.timestamp_offsets, parsed_values):
+        for ts, ts_offset, value in zip(
+            p.timestamps, p.timestamp_offsets, parsed_values
+        ):
             i._data.insert(ts=ts, ts_offset=ts_offset, value=dict(value))
         return i
 
@@ -565,7 +617,7 @@ class FastDictTimeseries(BaseTimeseries):
         keys = []
         metrics = []
         merged = defaultdict(dict)
-        
+
         # check keys and metric
         for f in float_timeseries:
             keys.append(f.key)
@@ -585,21 +637,27 @@ class FastDictTimeseries(BaseTimeseries):
 
         return new_ts
 
-    def yield_rows(self, timestamp_format="tuple", aggregation_span=None, aggregation_type=None):
-        it = self.get_serializable_iterator(timestamp_format, aggregation_span=aggregation_span,
-                                            aggregation_type=aggregation_type)
+    def yield_rows(
+        self, timestamp_format="tuple", aggregation_span=None, aggregation_type=None
+    ):
+        it = self.get_serializable_iterator(
+            timestamp_format,
+            aggregation_span=aggregation_span,
+            aggregation_type=aggregation_type,
+        )
         if self.columns:
             for ts, value in it:
                 if not value:
-                    row = (ts, ) + tuple(None for _ in self.columns)
+                    row = (ts,) + tuple(None for _ in self.columns)
                 else:
-                    row = (ts, ) + tuple(value.get(c, None) for c in self.columns)
-                yield(row)
+                    row = (ts,) + tuple(value.get(c, None) for c in self.columns)
+                yield (row)
         else:
             yield from it
 
     def to_csv(self, fp):
         import csv
+
         w = csv.writer(fp, quoting=csv.QUOTE_NONNUMERIC)
         if self.columns:
             w.writerow(["ts"] + [x for x in self.columns])
@@ -608,6 +666,7 @@ class FastDictTimeseries(BaseTimeseries):
 
     def to_pandas(self):
         raise NotImplementedError
+
 
 class EventList(FastDictTimeseries):
     @property
@@ -624,7 +683,9 @@ class EventList(FastDictTimeseries):
     def from_proto(cls, p):
         i = cls(p.key, p.name)
         parsed_values = [SerializableDict.from_proto(x) for x in p.values]
-        for ts, ts_offset, value in zip(p.timestamps, p.timestamp_offsets, parsed_values):
+        for ts, ts_offset, value in zip(
+            p.timestamps, p.timestamp_offsets, parsed_values
+        ):
             i._data.insert(ts=ts, ts_offset=ts_offset, value=dict(value))
         return i
 
@@ -734,8 +795,7 @@ class ReaderActivityItem(object):
         self.device_ids = list(device_ids)
 
     def __repr__(self):
-        return "<{}.{}: {}>".format(
-            self.reader_id, self.day_hour, self.device_ids)
+        return "<{}.{}: {}>".format(self.reader_id, self.day_hour, self.device_ids)
 
     @classmethod
     def from_proto_bytes(cls, b):
@@ -748,8 +808,11 @@ class ReaderActivityItem(object):
         return cls(p.day_hour, p.reader_id, p.device_ids)
 
     def to_proto(self):
-        d = ReaderActivity(day_hour=self.day_hour, reader_id=self.reader_id,
-                           device_ids=list(self.device_ids))
+        d = ReaderActivity(
+            day_hour=self.day_hour,
+            reader_id=self.reader_id,
+            device_ids=list(self.device_ids),
+        )
         return d
 
     def to_proto_bytes(self):
@@ -757,7 +820,11 @@ class ReaderActivityItem(object):
         return p.SerializeToString()
 
     def to_dict(self):
-        return {"day_hour": self.day_hour_dt, "reader_id": self.reader_id, "device_ids": self.device_ids}
+        return {
+            "day_hour": self.day_hour_dt,
+            "reader_id": self.reader_id,
+            "device_ids": self.device_ids,
+        }
 
     @property
     def day_hour_dt(self):
@@ -775,8 +842,7 @@ class DeviceActivityItem(object):
         self.counter = int(counter)
 
     def __repr__(self):
-        return "<{}.{}: {}>".format(
-            self.device_id, self.day_hour, self.counter)
+        return "<{}.{}: {}>".format(self.device_id, self.day_hour, self.counter)
 
     @classmethod
     def from_proto_bytes(cls, b):
@@ -789,8 +855,9 @@ class DeviceActivityItem(object):
         return cls(p.day_hour, p.device_id, p.counter)
 
     def to_proto(self):
-        d = DeviceActivity(day_hour=self.day_hour, device_id=self.device_id,
-                           counter=int(self.counter))
+        d = DeviceActivity(
+            day_hour=self.day_hour, device_id=self.device_id, counter=int(self.counter)
+        )
         return d
 
     def to_proto_bytes(self):
@@ -798,7 +865,11 @@ class DeviceActivityItem(object):
         return p.SerializeToString()
 
     def to_dict(self):
-        return {"day_hour": self.day_hour_dt, "device_id": self.device_id, "counter": self.counter}
+        return {
+            "day_hour": self.day_hour_dt,
+            "device_id": self.device_id,
+            "counter": self.counter,
+        }
 
     @property
     def day_hour_dt(self):

@@ -1,0 +1,46 @@
+[tool.poetry]
+name = "cattledb"
+version = "1.0.0"
+description = "Device Data Store on Bigtable"
+authors = [
+    "Florian Klien <florian.klien@smaxtec.com>",
+    "Kristof Krenn <kristof.krenn@smaxtec.com>",
+    "Matthias Thym <matthias.thym@smaxtec.com>",
+    "Matthias Wutte <matthias.wutte@gmail.com>",
+    "Matthias Wutte <matthias.wutte@smaxtec.com>"
+]
+license = "MIT"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = ">=3.7"
+msgpack = "^1.0.5"
+pendulum = ">=2.0.1"
+grpcio = "^1.56.0"
+blinker = "^1.6.2"
+protobuf = "3.20.1"
+google-cloud-bigtable = ">=1.2.1"
+google-cloud-core = ">=1.2.0"
+click = "^8.1.5"
+
+[tool.poetry.group.test.dependencies]
+pytest = "^7.4.0"
+mock = "^5.1.0"
+
+[tool.poetry.group.rest.dependencies]
+flask = ">1.1.1"
+
+[tool.poetry.group.protoc.dependencies]
+grpcio-tools = "1.48.2"
+
+[build-system]
+requires = ["poetry-core>=1.5.1"]
+build-backend = "poetry.core.masonry.api"
+
+
+[tool.semantic_release]
+version_variable = [ "pyproject.toml:version" ]
+build_command = "poetry build"
+
+[tool.isort]
+profile = "black"

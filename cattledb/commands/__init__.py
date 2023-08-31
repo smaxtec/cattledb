@@ -4,13 +4,13 @@
 import click
 
 from ..core.helper import import_config_file
-from ..settings import default as _default_config
 from ..directclient import CDBClient
+from ..settings import default as _default_config
 
 
 @click.group()
-@click.option('--configfile', '-c', type=click.Path(exists=True))
-@click.option('--configclass', type=str)
+@click.option("--configfile", "-c", type=click.Path(exists=True))
+@click.option("--configclass", type=str)
 @click.pass_context
 def cli(ctx, configfile, configclass):
     """CattleDB Command Line Tool"""
@@ -32,7 +32,7 @@ def cli(ctx, configfile, configclass):
     ctx.obj["config"] = config
 
 
-from .base import initdb, dbinfo, newmetric, newevent, runserver, download_timeseries
+from .base import dbinfo, download_timeseries, initdb, newevent, newmetric, runserver
 
 cli.add_command(initdb)
 cli.add_command(dbinfo)

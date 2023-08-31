@@ -1,64 +1,51 @@
-# Cattle DB #
+# Cattle DB
 
-[![Build Tests](https://github.com/wuttem/cattledb/actions/workflows/python-package.yml/badge.svg)](https://github.com/wuttem/cattledb/actions/workflows/python-package.yml)
-[![Mentioned in Awesome Bigtable](https://awesome.re/mentioned-badge-flat.svg)](https://github.com/zrosenbauer/awesome-bigtable)
-
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
 Fast Time Series Database Implementation.
 
-CattleDB can store timeseries data in typical cloud noSQL databases.
-At the moment bigtable and dynamodb storage backends are implemented.
+CattleDB can store timeseries data in typical cloud NoSQL databases.
+At the moment Bigtable (GCP) and DynamoDB (AWS) storage backends are implemented.
 Data can be queried by time ranges very efficiently.
 
 CattleDB can be used as a library in projects or as a standalone service with a REST/gRPC backend to put/get data.
 
-
 ## Installation
-Recursive Option is needed to build the C Speedups.
-```
-git clone --recursive https://github.com:wuttem/cattledb.git
-pip install ./cattledb
-```
 
-## Run Docker Emulator for Tests on Machine
+Recursive option is needed to build the C speedups.
 
-```bash
-docker run -it -p 8080:8080 spotify/bigtable-emulator:latest
-export BIGTABLE_EMULATOR_HOST=localhost:8080
-pytest tests
+```sh
+git clone --recursive https://github.com:smaxtec/cattledb.git
+devenv shell
 ```
 
+## Run tests against bigtable-emulator container
 
-## Build and Start Tests in docker
+```sh
+devenv shell
+run-cattledb-tests
 ```
+
+## Compile Python protobuf files
+
+```sh
+devenv shell
+compile-protobuf-files
+```
+
+## Build cattledb container
+
+```sh
+devenv shell
+build-cattledb-container
+```
+
+## Build container and run tests inside container manually
+
+```sh
 docker build . -t cattledb-test
-docker run -it cattledb-test bash
+docker run -it cattledb-test
 service bigtable-server start
 export BIGTABLE_EMULATOR_HOST="localhost:8080"
-pytest tests
-```
-
-
-## Compile python protobuf file
-```bash
-# RUN
-python -m grpc.tools.protoc --python_out=./cattledb/grpcserver --grpc_python_out=./cattledb/grpcserver --proto_path=./protos cdb.proto
-# cd to .\cattledb\grpcserver\cdb_pb2_grpc.py
-# change line
-import cdb_pb2 as cdb__pb2
-# to
-from . import cdb_pb2 as cdb__pb2
-```
-
-## Build and Push cattledb docker
-```bash
-docker build . -t mths/cattledb:latest
-docker tag mths/cattledb:latest mths/cattledb:0.1
-docker push mths/cattledb
-```
-
-## Development Build / Upload
-```
-python setup.py sdist
-twine upload dist/*
+/app/.venv/bin/pytest tests -vv
 ```

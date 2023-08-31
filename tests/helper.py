@@ -1,8 +1,8 @@
 #!/usr/bin/python
 # coding: utf-8
 
-from cattledb.storage.connection import Connection
 from cattledb.settings import testing as test_config
+from cattledb.storage.connection import Connection
 
 
 def get_unit_test_config():

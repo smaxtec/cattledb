@@ -1,17 +1,16 @@
 from sanic import Blueprint
 from sanic.response import json
 
+bp = Blueprint("base")
 
-bp = Blueprint('base')
 
-
-@bp.route('/')
+@bp.route("/")
 def base_root(request):
     db = request.app.cdb
     return json(db.info())
 
 
-@bp.route('/metrics')
+@bp.route("/metrics")
 def metrics(request):
     db = request.app.cdb
     connection = db.get_connection()
@@ -21,7 +20,7 @@ def metrics(request):
     return json(out)
 
 
-@bp.route('/events')
+@bp.route("/events")
 def events(request):
     db = request.app.cdb
     connection = db.get_connection()
@@ -31,14 +30,14 @@ def events(request):
     return json(out)
 
 
-@bp.route('/database')
+@bp.route("/database")
 def database(request):
     db = request.app.cdb
     s = db.get_database_structure()
     return json(s)
 
 
-@bp.route('/timeseries/<key:string>/<metric:string>/last_values')
+@bp.route("/timeseries/<key:string>/<metric:string>/last_values")
 async def last_values(request, key, metric):
     db = request.app.cdb
     s = await db.get_last_values(key, [metric])

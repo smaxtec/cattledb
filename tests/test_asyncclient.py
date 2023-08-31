@@ -1,16 +1,14 @@
 #!/usr/bin/python
 # coding: utf-8
 
-import unittest
-import random
-import logging
-import pendulum
-import os
-import datetime
 import asyncio
+import logging
+import unittest
 
+import pendulum
 
 from cattledb.directclient import AsyncCDBClient
+
 from .helper import get_unit_test_config
 
 
@@ -38,7 +36,9 @@ class AsyncTest(unittest.TestCase):
 
         loop = asyncio.get_event_loop()
 
-        res = loop.run_until_complete(client.put_metadata("object", "id1", "note2", {"föö": "bää"}))
+        res = loop.run_until_complete(
+            client.put_metadata("object", "id1", "note2", {"föö": "bää"})
+        )
         self.assertEqual(res, 1)
 
         res = loop.run_until_complete(client.get_metadata("object", "id1", ["note2"]))

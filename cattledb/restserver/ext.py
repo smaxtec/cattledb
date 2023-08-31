@@ -4,9 +4,7 @@
 
 import warnings
 
-
 from ..directclient import CDBClient
-
 
 try:
     from flask import _app_ctx_stack as stack
@@ -16,8 +14,15 @@ except ImportError:
 
 
 class FlaskCDB(object):
-    def __init__(self, engine=None, engine_options=None, read_only=False,
-                 admin=False, table_prefix="cdb", app=None):
+    def __init__(
+        self,
+        engine=None,
+        engine_options=None,
+        read_only=False,
+        admin=False,
+        table_prefix="cdb",
+        app=None,
+    ):
         """
         Initialize this extension.
 
@@ -44,23 +49,27 @@ class FlaskCDB(object):
 
     def init_settings(self, app):
         """Initialize all of the extension settings."""
-        app.config.setdefault('CATTLEDB_ENGINE', self.engine)
-        app.config.setdefault('CATTLEDB_ENGINE_OPTIONS', self.engine_options)
-        app.config.setdefault('CATTLEDB_READ_ONLY', self.read_only)
-        app.config.setdefault('CATTLEDB_ADMIN', self.admin)
-        app.config.setdefault('CATTLEDB_TABLE_PREFIX', self.table_prefix)
-        app.config.setdefault('CATTLEDB_CLIENT_CLASS', CDBClient)
+        app.config.setdefault("CATTLEDB_ENGINE", self.engine)
+        app.config.setdefault("CATTLEDB_ENGINE_OPTIONS", self.engine_options)
+        app.config.setdefault("CATTLEDB_READ_ONLY", self.read_only)
+        app.config.setdefault("CATTLEDB_ADMIN", self.admin)
+        app.config.setdefault("CATTLEDB_TABLE_PREFIX", self.table_prefix)
+        app.config.setdefault("CATTLEDB_CLIENT_CLASS", CDBClient)
 
     def _connect(self, _app):
-        if _app.config["CATTLEDB_CLIENT_CLASS"] and callable(_app.config["CATTLEDB_CLIENT_CLASS"]):
+        if _app.config["CATTLEDB_CLIENT_CLASS"] and callable(
+            _app.config["CATTLEDB_CLIENT_CLASS"]
+        ):
             cl = _app.config["CATTLEDB_CLIENT_CLASS"]
         else:
             cl = CDBClient
-        _db = cl(engine=_app.config["CATTLEDB_ENGINE"],
-                 engine_options=_app.config["CATTLEDB_ENGINE_OPTIONS"],
-                 read_only=_app.config["CATTLEDB_READ_ONLY"],
-                 admin=_app.config["CATTLEDB_ADMIN"],
-                 table_prefix=_app.config["CATTLEDB_TABLE_PREFIX"])
+        _db = cl(
+            engine=_app.config["CATTLEDB_ENGINE"],
+            engine_options=_app.config["CATTLEDB_ENGINE_OPTIONS"],
+            read_only=_app.config["CATTLEDB_READ_ONLY"],
+            admin=_app.config["CATTLEDB_ADMIN"],
+            table_prefix=_app.config["CATTLEDB_TABLE_PREFIX"],
+        )
         _db.service_init()
         return _db
 

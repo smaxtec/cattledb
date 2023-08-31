@@ -1,23 +1,28 @@
 #!/usr/bin/python
 # coding: utf-8
 
-import os
 import logging
+import os
 import struct
 import time
-
 from collections import OrderedDict
 
-from google.cloud import bigtable
 from google.auth.credentials import AnonymousCredentials
-from google.cloud.bigtable.row_filters import CellsColumnLimitFilter, FamilyNameRegexFilter, RowFilterChain, RowFilterUnion, RowKeyRegexFilter
-from google.cloud.bigtable.row_set import RowSet
+from google.cloud import bigtable
 from google.cloud._helpers import _to_bytes
 from google.cloud.bigtable.column_family import MaxVersionsGCRule
-# from google.oauth2 import service_account
-
+from google.cloud.bigtable.row_filters import (
+    CellsColumnLimitFilter,
+    FamilyNameRegexFilter,
+    RowFilterChain,
+    RowFilterUnion,
+    RowKeyRegexFilter,
+)
+from google.cloud.bigtable.row_set import RowSet
 
 from .base import StorageEngine, StorageTable
+
+# from google.oauth2 import service_account
 
 
 logger = logging.getLogger(__name__)
@@ -56,7 +61,9 @@ class BigtableEngine(StorageEngine):
         families_before = t.list_column_families()
         logger.debug("CREATE CF: Existing Families: {}".format(families_before))
         if silent and column_family in families_before:
-            logger.warning("CREATE CF: Ignoring existing family: {}".format(column_family))
+            logger.warning(
+                "CREATE CF: Ignoring existing family: {}".format(column_family)
+            )
             return
         cf1 = t.column_family(column_family, gc_rule=MaxVersionsGCRule(1))
         cf1.create()
@@ -68,8 +75,9 @@ class BigtableEngine(StorageEngine):
         if not self.admin or self.read_only:
             raise RuntimeError("creation of admin connection not allowed")
         if self.admin_connection is None:
-            self.admin_connection = bigtable.Client(project=self.project_id, admin=True,
-                                                    credentials=self.credentials).instance(self.instance_id)
+            self.admin_connection = bigtable.Client(
+                project=self.project_id, admin=True, credentials=self.credentials
+            ).instance(self.instance_id)
             logger.warning("Created new admin connection")
         return self.admin_connection
 
@@ -87,8 +95,10 @@ class BigtableEngine(StorageEngine):
         self.instance_id = None
         self.project_id = None
 
-        bigtable_emu = os.environ.get('BIGTABLE_EMULATOR_HOST', None)
-        if bigtable_emu or ("emulator" in engine_options and engine_options["emulator"]):
+        bigtable_emu = os.environ.get("BIGTABLE_EMULATOR_HOST", None)
+        if bigtable_emu or (
+            "emulator" in engine_options and engine_options["emulator"]
+        ):
             self.credentials = AnonymousCredentials()
         elif "credentials" not in engine_options:
             raise ValueError("missing credentials option for bigtable engine")
@@ -109,8 +119,12 @@ class BigtableEngine(StorageEngine):
 
     def connect(self):
         if self.db_connection is None:
-            self.db_connection = bigtable.Client(project=self.project_id, admin=False, read_only=self.read_only,
-                                                 credentials=self.credentials).instance(self.instance_id)
+            self.db_connection = bigtable.Client(
+                project=self.project_id,
+                admin=False,
+                read_only=self.read_only,
+                credentials=self.credentials,
+            ).instance(self.instance_id)
         return self.db_connection
 
     def disconnect(self):
@@ -182,7 +196,11 @@ class BigtableTable(StorageTable):
             row.set_cell(column_family.encode("utf-8"), col.encode("utf-8"), value)
         response = self._low_level.mutate_rows([row])[0]
         if response.code != 0:
-            raise ValueError("Bigtable upsert failed with: {} - {}".format(response.code, response.message))
+            raise ValueError(
+                "Bigtable upsert failed with: {} - {}".format(
+                    response.code, response.message
+                )
+            )
         return response
 
     def upsert_rows(self, row_upserts):
@@ -196,11 +214,19 @@ class BigtableTable(StorageTable):
         responses = self._low_level.mutate_rows(rows)
         for r in responses:
             if r.code != 0:
-                raise ValueError("Bigtable upsert failed with: {} - {}".format(r.code, r.message))
+                raise ValueError(
+                    "Bigtable upsert failed with: {} - {}".format(r.code, r.message)
+                )
         return responses
 
-    def row_generator(self, row_keys=None, start_key=None, end_key=None,
-                      column_families=None, check_prefix=None):
+    def row_generator(
+        self,
+        row_keys=None,
+        start_key=None,
+        end_key=None,
+        column_families=None,
+        check_prefix=None,
+    ):
         if row_keys is None and start_key is None:
             raise ValueError("use row_keys or start_key parameter")
         if start_key is not None and (end_key is None and check_prefix is None):
@@ -225,8 +251,12 @@ class BigtableTable(StorageTable):
             for r in row_keys:
                 row_set.add_row_key(r)
         else:
-            row_set.add_row_range_from_keys(start_key=start_key, end_key=end_key,
-                                            start_inclusive=True, end_inclusive=True)
+            row_set.add_row_range_from_keys(
+                start_key=start_key,
+                end_key=end_key,
+                start_inclusive=True,
+                end_inclusive=True,
+            )
 
         generator = self._low_level.read_rows(filter_=filter_, row_set=row_set)
 
@@ -260,7 +290,9 @@ class BigtableTable(StorageTable):
             filter_ = filters[0]
 
         row_set = RowSet()
-        row_set.add_row_range_from_keys(start_key=start_key, start_inclusive=True, end_key=end_key)
+        row_set.add_row_range_from_keys(
+            start_key=start_key, start_inclusive=True, end_key=end_key
+        )
 
         generator = self._low_level.read_rows(filter_=filter_, row_set=row_set)
 
@@ -303,9 +335,10 @@ class BigtableTable(StorageTable):
         :returns: Counter value after incrementing.
         """
         row = self._low_level.append_row(row_id.encode("utf-8"))
-        column_family_id, column_qualifier = column.split(':')
-        row.increment_cell_value(column_family_id.encode("utf-8"),
-                                 column_qualifier.encode("utf-8"), value)
+        column_family_id, column_qualifier = column.split(":")
+        row.increment_cell_value(
+            column_family_id.encode("utf-8"), column_qualifier.encode("utf-8"), value
+        )
         modified_cells = row.commit()
 
         inner_keys = list(modified_cells[column_family_id].keys())
@@ -313,21 +346,21 @@ class BigtableTable(StorageTable):
             raise KeyError(column_qualifier)
 
         if isinstance(inner_keys[0], bytes):
-            column_cells = modified_cells[
-                column_family_id][column_qualifier.encode("latin-1")]
+            column_cells = modified_cells[column_family_id][
+                column_qualifier.encode("latin-1")
+            ]
         elif isinstance(inner_keys[0], str):
-            column_cells = modified_cells[
-                column_family_id][column_qualifier]
+            column_cells = modified_cells[column_family_id][column_qualifier]
         else:
             raise KeyError(column_qualifier)
 
         # Make sure there is exactly one cell in the column.
         if len(column_cells) != 1:
-            raise ValueError('Expected server to return one modified cell.')
+            raise ValueError("Expected server to return one modified cell.")
         column_cell = column_cells[0]
         # Get the bytes value from the column and convert it to an integer.
         bytes_value = column_cell[0]
-        int_value, = struct.Struct('>q').unpack(bytes_value)
+        (int_value,) = struct.Struct(">q").unpack(bytes_value)
         return int_value
 
     def get_column_families(self):

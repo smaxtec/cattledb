@@ -1,14 +1,13 @@
 #!/usr/bin/python
 # coding: utf-8
 
-import unittest
-import pendulum
-import random
-import logging
 import binascii
-import datetime
+import logging
+import unittest
 
-from cattledb.core.models import FastFloatTimeseries, FastDictTimeseries
+import pendulum
+
+from cattledb.core.models import FastDictTimeseries, FastFloatTimeseries
 
 
 class ModelTest(unittest.TestCase):
@@ -32,10 +31,13 @@ class ModelTest(unittest.TestCase):
 
         ts1.insert_point((1100, 1800), 5.1)
         ts1.insert(
-            [((1200, 1800), 5.2),
-             ((1300, 1800), 5.3),
-             ((1500, 1800), 5.5),
-             ((1400, 1800), 5.4)])
+            [
+                ((1200, 1800), 5.2),
+                ((1300, 1800), 5.3),
+                ((1500, 1800), 5.5),
+                ((1400, 1800), 5.4),
+            ]
+        )
         assert ts1.empty() == False
         assert len(ts1) == 5
 
@@ -53,18 +55,30 @@ class ModelTest(unittest.TestCase):
 
     def test_ts_trim(self):
         events = [
-            (pendulum.datetime(2015, 2, 5, 13, 0, tz='UTC').int_timestamp, {"foo2": "bar2"}),
-            (pendulum.datetime(2015, 2, 6, 12, 0, tz='UTC').int_timestamp, {"foo4": "bar4"}),
-            (pendulum.datetime(2015, 2, 5, 12, 0, tz='UTC').int_timestamp, {"foo1": "bar1"}),
-            (pendulum.datetime(2015, 2, 5, 18, 0, tz='UTC').int_timestamp, {"foo3": "bar3"})
+            (
+                pendulum.datetime(2015, 2, 5, 13, 0, tz="UTC").int_timestamp,
+                {"foo2": "bar2"},
+            ),
+            (
+                pendulum.datetime(2015, 2, 6, 12, 0, tz="UTC").int_timestamp,
+                {"foo4": "bar4"},
+            ),
+            (
+                pendulum.datetime(2015, 2, 5, 12, 0, tz="UTC").int_timestamp,
+                {"foo1": "bar1"},
+            ),
+            (
+                pendulum.datetime(2015, 2, 5, 18, 0, tz="UTC").int_timestamp,
+                {"foo3": "bar3"},
+            ),
         ]
         ts1 = FastDictTimeseries("hello", "world")
         assert ts1.empty() == True
 
         ts1.insert(events)
         assert len(ts1) == 4
-        t1 = pendulum.datetime(2015, 2, 5, 12, 0, tz='UTC').int_timestamp
-        t2 = pendulum.datetime(2015, 2, 5, 17, 0, tz='UTC').int_timestamp
+        t1 = pendulum.datetime(2015, 2, 5, 12, 0, tz="UTC").int_timestamp
+        t2 = pendulum.datetime(2015, 2, 5, 17, 0, tz="UTC").int_timestamp
         ts1.trim(t1, t2)
         assert len(ts1) == 2
 
@@ -73,11 +87,11 @@ class ModelTest(unittest.TestCase):
         ts2 = FastFloatTimeseries("fff", "temp")
 
         # daily, timeshift to winter
-        start = pendulum.datetime(2018, 10, 25, 0, 0, tz='Europe/Vienna')
+        start = pendulum.datetime(2018, 10, 25, 0, 0, tz="Europe/Vienna")
         cur = start
         for i in range(10):
             for j in range(24 * 6):
-                ts1.insert_point(cur, float(i+1))
+                ts1.insert_point(cur, float(i + 1))
                 cur = cur.add(minutes=10)
         end = cur
         self.assertEqual(start.add(days=10).subtract(hours=1), end)
@@ -107,11 +121,11 @@ class ModelTest(unittest.TestCase):
         self.assertEqual(l[-1].value, 10.0)
 
         # daily, timeshift to summer
-        start = pendulum.datetime(2018, 3, 20, 0, 0, tz='Europe/Vienna')
+        start = pendulum.datetime(2018, 3, 20, 0, 0, tz="Europe/Vienna")
         cur = start
         for i in range(10):
             for j in range(24 * 6):
-                ts2.insert_point(cur, float(i+1))
+                ts2.insert_point(cur, float(i + 1))
                 cur = cur.add(minutes=10)
         end = cur
         self.assertEqual(start.add(days=10).add(hours=1), end)

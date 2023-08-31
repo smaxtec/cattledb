@@ -1,13 +1,34 @@
 import grpc
 import pendulum
 from pendulum.parsing.exceptions import ParserError
-from .cdb_pb2 import FloatTimeSeries, FloatTimeSeriesList, PutResult, DeleteResult, EventSeries, MetaDataResponse, ActivityResponse, DeviceActivityResponse
-from .cdb_pb2_grpc import TimeSeriesServicer, ActivityServicer, MetaDataServicer, EventsServicer
-from ..storage.models import TimeSeries, EventList, SerializableNamespaceDict, MetaDataItem
+
+from ..storage.models import (
+    EventList,
+    MetaDataItem,
+    SerializableNamespaceDict,
+    TimeSeries,
+)
+from .cdb_pb2 import (
+    ActivityResponse,
+    DeleteResult,
+    DeviceActivityResponse,
+    EventSeries,
+    FloatTimeSeries,
+    FloatTimeSeriesList,
+    MetaDataResponse,
+    PutResult,
+)
+from .cdb_pb2_grpc import (
+    ActivityServicer,
+    EventsServicer,
+    MetaDataServicer,
+    TimeSeriesServicer,
+)
 
 
 class TimeSeriesServicer(TimeSeriesServicer):
     """Provides methods that implement functionality of route guide server."""
+
     def __init__(self, db_instance):
         self.db = db_instance
 
@@ -15,9 +36,14 @@ class TimeSeriesServicer(TimeSeriesServicer):
         # request: TimeSeriesRequest
         # return: FloatTimeSeries
 
-        if not request.key or not request.metric or not request.from_datetime or not request.to_datetime:
+        if (
+            not request.key
+            or not request.metric
+            or not request.from_datetime
+            or not request.to_datetime
+        ):
             context.set_code(grpc.StatusCode.INVALID_ARGUMENT)
-            context.set_details('Invalid Request')
+            context.set_details("Invalid Request")
             return FloatTimeSeries()
 
         try:
@@ -31,16 +57,23 @@ class TimeSeriesServicer(TimeSeriesServicer):
         from_ts = from_dt.int_timestamp
         to_ts = to_dt.int_timestamp
 
-        ts = self.db.timeseries.get_single_timeseries(request.key, request.metric, from_ts, to_ts)
+        ts = self.db.timeseries.get_single_timeseries(
+            request.key, request.metric, from_ts, to_ts
+        )
         return ts.to_proto()
 
     def getMulti(self, request, context):
         # request: MultiTimeSeriesRequest
         # return: FloatTimeSeriesList
 
-        if not request.key or not request.metrics or not request.from_datetime or not request.to_datetime:
+        if (
+            not request.key
+            or not request.metrics
+            or not request.from_datetime
+            or not request.to_datetime
+        ):
             context.set_code(grpc.StatusCode.INVALID_ARGUMENT)
-            context.set_details('Invalid Request')
+            context.set_details("Invalid Request")
             return FloatTimeSeriesList()
 
         try:
@@ -54,7 +87,9 @@ class TimeSeriesServicer(TimeSeriesServicer):
         from_ts = from_dt.int_timestamp
         to_ts = to_dt.int_timestamp
 
-        ts_list = self.db.timeseries.get_timeseries(request.key, request.metrics, from_ts, to_ts)
+        ts_list = self.db.timeseries.get_timeseries(
+            request.key, request.metrics, from_ts, to_ts
+        )
         l = FloatTimeSeriesList()
         l.data.extend([r.to_proto() for r in ts_list])
         return l
@@ -63,16 +98,25 @@ class TimeSeriesServicer(TimeSeriesServicer):
         # request: FloatTimeSeries
         # return: PutResult
 
-        if (not request.key or not request.metric or not request.timestamps
-                or not request.values or not request.timestamp_offsets):
+        if (
+            not request.key
+            or not request.metric
+            or not request.timestamps
+            or not request.values
+            or not request.timestamp_offsets
+        ):
             context.set_code(grpc.StatusCode.INVALID_ARGUMENT)
-            context.set_details('Invalid Request')
+            context.set_details("Invalid Request")
             return PutResult()
 
         assert 2 <= len(request.metric) <= 64
         assert 3 <= len(request.key) <= 32
         assert len(request.timestamps) > 0
-        assert len(request.values) == len(request.timestamps) == len(request.timestamp_offsets)
+        assert (
+            len(request.values)
+            == len(request.timestamps)
+            == len(request.timestamp_offsets)
+        )
 
         ts = TimeSeries.from_proto(request)
         res = self.db.timeseries.insert_timeseries(ts)
@@ -83,10 +127,15 @@ class TimeSeriesServicer(TimeSeriesServicer):
         # return: PutResult
 
         for p in request.data:
-            if (not p.key or not p.metric or not p.timestamps
-                or not p.values or not p.timestamp_offsets):
+            if (
+                not p.key
+                or not p.metric
+                or not p.timestamps
+                or not p.values
+                or not p.timestamp_offsets
+            ):
                 context.set_code(grpc.StatusCode.INVALID_ARGUMENT)
-                context.set_details('Invalid Request')
+                context.set_details("Invalid Request")
                 return PutResult()
 
             assert 2 <= len(p.metric) <= 64
@@ -107,7 +156,7 @@ class TimeSeriesServicer(TimeSeriesServicer):
 
         if not request.key or not request.metrics:
             context.set_code(grpc.StatusCode.INVALID_ARGUMENT)
-            context.set_details('Invalid Request')
+            context.set_details("Invalid Request")
             return FloatTimeSeriesList()
 
         ts_list = self.db.timeseries.get_last_values(request.key, request.metrics)
@@ -119,9 +168,14 @@ class TimeSeriesServicer(TimeSeriesServicer):
         # request: MultiTimeSeriesRequest
         # return: DeleteResult
 
-        if not request.key or not request.metrics or not request.from_datetime or not request.to_datetime:
+        if (
+            not request.key
+            or not request.metrics
+            or not request.from_datetime
+            or not request.to_datetime
+        ):
             context.set_code(grpc.StatusCode.INVALID_ARGUMENT)
-            context.set_details('Invalid Request')
+            context.set_details("Invalid Request")
             return DeleteResult()
 
         try:
@@ -135,12 +189,15 @@ class TimeSeriesServicer(TimeSeriesServicer):
         from_ts = from_dt.int_timestamp
         to_ts = to_dt.int_timestamp
 
-        res = self.db.timeseries.delete_timeseries(request.key, request.metrics, from_ts, to_ts)
+        res = self.db.timeseries.delete_timeseries(
+            request.key, request.metrics, from_ts, to_ts
+        )
         return DeleteResult(code=200, counter=int(res), message="success")
 
 
 class ActivityServicer(ActivityServicer):
     """Provides methods that implement functionality of route guide server."""
+
     def __init__(self, db_instance):
         self.db = db_instance
 
@@ -149,7 +206,7 @@ class ActivityServicer(ActivityServicer):
         # return: ActivityResponse
         if not request.day_datetime:
             context.set_code(grpc.StatusCode.INVALID_ARGUMENT)
-            context.set_details('Invalid Request')
+            context.set_details("Invalid Request")
             return ActivityResponse()
 
         try:
@@ -169,7 +226,7 @@ class ActivityServicer(ActivityServicer):
         # return: ActivityResponse
         if not request.day_datetime or not request.parent_id:
             context.set_code(grpc.StatusCode.INVALID_ARGUMENT)
-            context.set_details('Invalid Request')
+            context.set_details("Invalid Request")
             return ActivityResponse()
 
         try:
@@ -187,9 +244,13 @@ class ActivityServicer(ActivityServicer):
     def getReader(self, request, context):
         # request: ReaderActivityRequest
         # return: DeviceActivityResponse
-        if not request.from_datetime or not request.to_datetime or not request.reader_id:
+        if (
+            not request.from_datetime
+            or not request.to_datetime
+            or not request.reader_id
+        ):
             context.set_code(grpc.StatusCode.INVALID_ARGUMENT)
-            context.set_details('Invalid Request')
+            context.set_details("Invalid Request")
             return DeviceActivityResponse()
 
         try:
@@ -203,7 +264,9 @@ class ActivityServicer(ActivityServicer):
         from_ts = from_dt.int_timestamp
         to_ts = to_dt.int_timestamp
 
-        res = self.db.activity.get_activity_for_reader(request.reader_id, from_ts, to_ts)
+        res = self.db.activity.get_activity_for_reader(
+            request.reader_id, from_ts, to_ts
+        )
         return DeviceActivityResponse(activities=[x.to_proto() for x in res])
 
     def increment(self, request, context):
@@ -212,7 +275,7 @@ class ActivityServicer(ActivityServicer):
 
         if not request.reader_id or not request.device_id or not request.timestamp:
             context.set_code(grpc.StatusCode.INVALID_ARGUMENT)
-            context.set_details('Invalid Request')
+            context.set_details("Invalid Request")
             return PutResult()
 
         try:
@@ -234,13 +297,19 @@ class ActivityServicer(ActivityServicer):
         else:
             parents = None
 
-        res = self.db.activity.incr_activity(request.reader_id, request.device_id,
-                                             timestamp=ts, parent_ids=parents, value=value)
+        res = self.db.activity.incr_activity(
+            request.reader_id,
+            request.device_id,
+            timestamp=ts,
+            parent_ids=parents,
+            value=value,
+        )
         return PutResult(code=200, counter=len(res), message="success")
 
 
 class MetaDataServicer(MetaDataServicer):
     """Provides methods that implement functionality of route guide server."""
+
     def __init__(self, db_instance):
         self.db = db_instance
 
@@ -249,7 +318,7 @@ class MetaDataServicer(MetaDataServicer):
         # return: MetaDataResponse
         if not request.object_name or not request.object_key:
             context.set_code(grpc.StatusCode.INVALID_ARGUMENT)
-            context.set_details('Invalid Request')
+            context.set_details("Invalid Request")
             return MetaDataResponse()
 
         if not request.namespaces:
@@ -262,8 +331,12 @@ class MetaDataServicer(MetaDataServicer):
         else:
             internal = list(request.internal)
 
-        res = MetaDataResponse(object_name=request.object_name, object_key=request.object_key)
-        md = self.db.metadata.get_metadata(request.object_name, request.object_key, keys=namespaces, internal=internal)
+        res = MetaDataResponse(
+            object_name=request.object_name, object_key=request.object_key
+        )
+        md = self.db.metadata.get_metadata(
+            request.object_name, request.object_key, keys=namespaces, internal=internal
+        )
 
         proto_dicts = []
         if md is not None:
@@ -278,7 +351,7 @@ class MetaDataServicer(MetaDataServicer):
         # return: PutResult
         if not request.object_name or not request.object_key or len(request.data) < 1:
             context.set_code(grpc.StatusCode.INVALID_ARGUMENT)
-            context.set_details('Invalid Request')
+            context.set_details("Invalid Request")
             return PutResult()
 
         if not request.internal:
@@ -289,7 +362,11 @@ class MetaDataServicer(MetaDataServicer):
         metas = []
         for item in request.data:
             d = SerializableNamespaceDict.from_proto(item)
-            metas.append(MetaDataItem(request.object_name, request.object_key, d.namespace, d.to_dict()))
+            metas.append(
+                MetaDataItem(
+                    request.object_name, request.object_key, d.namespace, d.to_dict()
+                )
+            )
 
         res = self.db.metadata.put_metadata_items(metas, internal=internal)
         return PutResult(code=200, counter=int(res), message="success")
@@ -297,6 +374,7 @@ class MetaDataServicer(MetaDataServicer):
 
 class EventsServicer(EventsServicer):
     """Provides methods that implement functionality of route guide server."""
+
     def __init__(self, db_instance):
         self.db = db_instance
 
@@ -304,9 +382,14 @@ class EventsServicer(EventsServicer):
         # request: EventsRequest
         # return: EventSeries
 
-        if not request.key or not request.name or not request.from_datetime or not request.to_datetime:
+        if (
+            not request.key
+            or not request.name
+            or not request.from_datetime
+            or not request.to_datetime
+        ):
             context.set_code(grpc.StatusCode.INVALID_ARGUMENT)
-            context.set_details('Invalid Request')
+            context.set_details("Invalid Request")
             return EventSeries()
 
         try:
@@ -329,7 +412,7 @@ class EventsServicer(EventsServicer):
 
         if not request.key or not request.name:
             context.set_code(grpc.StatusCode.INVALID_ARGUMENT)
-            context.set_details('Invalid Request')
+            context.set_details("Invalid Request")
             return EventSeries()
 
         ts = self.db.events.get_last_events(request.key, request.name)
@@ -339,16 +422,25 @@ class EventsServicer(EventsServicer):
         # request: EventSeries
         # return: PutResult
 
-        if (not request.key or not request.name or not request.timestamps
-                or not request.values or not request.timestamp_offsets):
+        if (
+            not request.key
+            or not request.name
+            or not request.timestamps
+            or not request.values
+            or not request.timestamp_offsets
+        ):
             context.set_code(grpc.StatusCode.INVALID_ARGUMENT)
-            context.set_details('Invalid Request')
+            context.set_details("Invalid Request")
             return PutResult()
 
         assert 2 <= len(request.name) <= 64
         assert 3 <= len(request.key) <= 32
         assert len(request.timestamps) > 0
-        assert len(request.values) == len(request.timestamps) == len(request.timestamp_offsets)
+        assert (
+            len(request.values)
+            == len(request.timestamps)
+            == len(request.timestamp_offsets)
+        )
 
         ts = EventList.from_proto(request)
         res = self.db.events.insert_events(ts)
@@ -358,9 +450,14 @@ class EventsServicer(EventsServicer):
         # request: EventsRequest
         # return: DeleteResult
 
-        if not request.key or not request.name or not request.from_datetime or not request.to_datetime:
+        if (
+            not request.key
+            or not request.name
+            or not request.from_datetime
+            or not request.to_datetime
+        ):
             context.set_code(grpc.StatusCode.INVALID_ARGUMENT)
-            context.set_details('Invalid Request')
+            context.set_details("Invalid Request")
             return DeleteResult()
 
         try:
@@ -374,5 +471,7 @@ class EventsServicer(EventsServicer):
         from_ts = from_dt.int_timestamp
         to_ts = to_dt.int_timestamp
 
-        res = self.db.events.delete_event_days(request.key, request.name, from_ts, to_ts)
+        res = self.db.events.delete_event_days(
+            request.key, request.name, from_ts, to_ts
+        )
         return DeleteResult(code=200, counter=int(res), message="success")

@@ -3,8 +3,6 @@
 
 import logging
 import logging.config
-import os
-
 
 # def init_s_db(app, loop):
 #     from ..directclient import AsyncCDBClient
@@ -23,26 +21,35 @@ import os
 
 
 def _create_app(config):
+    from flask import Flask
+
     from ..core.helper import setup_logging
 
-    from flask import Flask
     app = Flask("cattledb")
 
     # Setting Hostname
     import socket
+
     host_name = str(socket.gethostname())
     logging.getLogger().warning("Creating App on %s", host_name)
 
     # setup
     from .ext import FlaskCDB
-    db_ext = FlaskCDB(engine=config.ENGINE, engine_options=config.ENGINE_OPTIONS,
-                      read_only=config.READ_ONLY, admin=config.ADMIN,
-                      table_prefix=config.TABLE_PREFIX, app=app)
+
+    db_ext = FlaskCDB(
+        engine=config.ENGINE,
+        engine_options=config.ENGINE_OPTIONS,
+        read_only=config.READ_ONLY,
+        admin=config.ADMIN,
+        table_prefix=config.TABLE_PREFIX,
+        app=app,
+    )
     # warmup
     db_ext.warmup(app)
     app.cdb = db_ext
 
     from .services import bp
+
     app.register_blueprint(bp)
 
     return app

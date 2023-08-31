@@ -1,13 +1,14 @@
 #!/usr/bin/python
 # coding: utf-8
 
-import pendulum
-import datetime
 import bisect
+import datetime
 
+import pendulum
 
 try:
     from cdb_ext_ts import timeseries
+
     c_container = timeseries
     c_ext = True
 except ImportError:  # pragma: no cover
@@ -97,13 +98,13 @@ class py_timeseries(object):
         if idx == 0:
             return idx
         if idx == len(self):
-            return idx-1
+            return idx - 1
 
         t2 = self._data[idx][0]
-        t1 = self._data[idx-1][0]
+        t1 = self._data[idx - 1][0]
 
         if abs(ts - t1) <= abs(ts - t2):
-            return idx-1
+            return idx - 1
         return idx
 
     def index_of_ts(self, ts):
@@ -117,7 +118,7 @@ class py_timeseries(object):
 
     def iso_at(self, key):
         t = self.at(key)
-        dt = pendulum.from_timestamp(t[0], t[1]/3600.0)
+        dt = pendulum.from_timestamp(t[0], t[1] / 3600.0)
         return (dt.isoformat(), t[2])
 
     def bytes_at(self, key):
@@ -129,13 +130,13 @@ class py_timeseries(object):
     def trim_idx(self, start_idx, end_idx):
         assert 0 <= start_idx <= len(self)
         assert 0 <= end_idx
-        self._data = self._data[start_idx: end_idx+1]
+        self._data = self._data[start_idx : end_idx + 1]
 
     def trim_ts(self, start_ts, end_ts):
         idx1 = self.bisect_left(start_ts)
         idx2 = self.bisect_right(end_ts)
         if idx2 > 0:
-            self.trim_idx(idx1, idx2-1)
+            self.trim_idx(idx1, idx2 - 1)
         else:
             self._data.clear()
 
@@ -210,7 +211,7 @@ class _TSList(object):
 
     def datetime_at_index(self, i):
         item = self.at_index(i)
-        return (pendulum.from_timestamp(item[0], item[1]/3600.0), item[2])
+        return (pendulum.from_timestamp(item[0], item[1] / 3600.0), item[2])
 
     def bytes_at_index(self, i):
         return self._data.bytes_at(i)
@@ -293,6 +294,7 @@ class _TSList(object):
 
 class PyTSList(_TSList):
     __container__ = py_timeseries
+
 
 class FastFloatTSList(_TSList):
     __container__ = c_container
