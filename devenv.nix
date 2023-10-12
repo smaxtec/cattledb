@@ -15,7 +15,7 @@
 
   languages.python = {
     enable = true;
-    version = "3.10";
+    version = "3.11";
     poetry = {
       enable = true;
       activate.enable = true;
