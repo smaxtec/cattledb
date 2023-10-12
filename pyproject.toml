@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "cattledb"
-version = "1.0.1"
+version = "1.0.2"
 description = "Device Data Store on Bigtable"
 authors = [
     "Florian Klien <florian.klien@smaxtec.com>",
@@ -44,3 +44,12 @@ build_command = "poetry build"
 
 [tool.isort]
 profile = "black"
+
+[tool.pytest.ini_options]
+filterwarnings = [
+    # This should be removed once this issue with GCloud Python libraries is resolved:
+    # https://github.com/googleapis/google-cloud-python/issues/11184#issuecomment-1640884088
+    "ignore:Deprecated call to `pkg_resources\\.declare_namespace\\('.*'\\):DeprecationWarning",
+    "ignore::DeprecationWarning:google.rpc",
+    "ignore::DeprecationWarning:google.cloud",
+]
