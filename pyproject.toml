@@ -30,6 +30,9 @@ mock = "^5.1.0"
 [tool.poetry.group.protoc.dependencies]
 grpcio-tools = "^1.59.0"
 
+[tool.poetry.group.extensions.dependencies]
+pybind11 = "^2.11.1"
+
 [build-system]
 requires = ["poetry-core>=1.5.1"]
 build-backend = "poetry.core.masonry.api"

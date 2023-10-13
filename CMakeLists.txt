@@ -1,5 +1,6 @@
 cmake_minimum_required(VERSION 3.1)
 project(cdb_ext_ts)
 set (CMAKE_CXX_STANDARD 14)
-add_subdirectory(pybind11)
-pybind11_add_module(cdb_ext_ts src/cdb_ext_ts.cpp)
+set(pybind11_DIR ./.venv/lib/python3.11/site-packages/pybind11/share/cmake/pybind11)
+find_package(pybind11 REQUIRED)
+pybind11_add_module(cdb_ext_ts extensions/cdb_ext_ts.cpp)
