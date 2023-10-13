@@ -53,3 +53,20 @@ compile-extensions
 devenv shell
 build-cattledb-container
 ```
+
+## Using cbt to access Bigtable
+
+Launch Bigtable emulator.
+
+```sh
+docker compose -f docker/bigtable-emulator.yaml up -d
+```
+
+Inside the Docker container, the Google Cloud Bigtable Tool `cbt` is installed.
+With it, you can modify data on tables created on the Bigtable emulator.
+
+For a list of available commands, take a look at the [cbt CLI reference](https://cloud.google.com/bigtable/docs/cbt-reference).
+
+If one wishes to install the tool locally, you can find more information [here](https://cloud.google.com/bigtable/docs/cbt-overview).
+
+The tool can also be built from source available [here](https://github.com/googleapis/cloud-bigtable-cbt-cli).
