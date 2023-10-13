@@ -1,0 +1,11 @@
+---
+
+services:
+  bigtable-emulator:
+    image: bigtable-emulator
+    build:
+      context: ./
+    ports:
+      - "8080:8080"
+    environment:
+      BIGTABLE_EMULATOR_HOST: bigtable-emulator:8080
