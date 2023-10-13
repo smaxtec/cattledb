@@ -56,6 +56,10 @@ class DirectclientTests(unittest.TestCase):
             "sensor1", ["ph", "act", "temp"], t, t + 500 * 600 + 24 * 60 * 60
         )
 
+        # Check if all time series on key "sensor1" got deleted
+        self.assertEqual(client.get_full_timeseries("sensor1"), None)
+
+        # Generate a data point every 10 minutes
         d1 = [(t + i * 600, 6.5) for i in range(100)]
         d2 = [(t + i * 600, 25.5) for i in range(50)]
 
@@ -63,10 +67,20 @@ class DirectclientTests(unittest.TestCase):
             {"key": "sensor1", "metric": "ph", "data": d1},
             {"key": "sensor1", "metric": "temp", "data": d2},
         ]
-        res = client.put_timeseries_multi(data)
-        self.assertEqual(res[0], 100)
-        self.assertEqual(res[1], 50)
 
+        # Write metric time series to Bigtable
+        r = client.put_timeseries_multi(data)
+        self.assertEqual(r[0], 100)
+        self.assertEqual(r[1], 50)
+
+        # Check whether all data points get returned
+        r = client.get_full_timeseries("sensor1")
+        self.assertEqual(r[0][1], {"ph": 6.5, "temp": 25.5})
+        self.assertEqual(r[49][1], {"ph": 6.5, "temp": 25.5})
+        self.assertEqual(r[50][1], {"ph": 6.5})
+        self.assertEqual(r[99][1], {"ph": 6.5})
+
+        # Check whether time series get correctly returned for time range
         r = client.get_timeseries("sensor1", ["ph", "temp"], t, t + 70 * 600 - 1)
         self.assertEqual(len(r[0]), 70)
         self.assertEqual(len(r[1]), 50)
