@@ -1,9 +1,17 @@
-{ lib, pkgs, ... }:
+{ pkgs, ... }:
 
 {
   env.GREET = "🐄 Welcome to the development environment for cattledb! 🐄";
 
   dotenv.disableHint = true;
+
+  packages = with pkgs; [
+    gcc
+    cmake
+    gnumake
+    docker
+  ];
+
 
   enterShell = ''
     # See [here](https://discourse.nixos.org/t/nixos-with-poetry-installed-pandas-libstdc-so-6-cannot-open-shared-object-file/8442/9) why this is needed
@@ -21,7 +29,7 @@
       activate.enable = true;
       install = {
         enable = true;
-        groups = [ "test" "protoc" ];
+        groups = [ "test" "protoc" "extensions" ];
       };
     };
   };
@@ -44,14 +52,18 @@
 
   scripts = {
     run-cattledb-tests.exec = ''
-      docker run -d --rm -p 8080:8080 --name=bigtable-emulator spotify/bigtable-emulator:latest
+      docker compose -f docker/bigtable-emulator.yaml up -d
       pytest tests -vv
       docker stop bigtable-emulator
     '';
     build-cattledb-container.exec = ''
-      docker build . -t cattledb-test
+      docker compose -f docker/bigtable-emulator.yaml build
     '';
-    compile-protobuf-files.exec = ''
+    compile-extensions.exec = ''
+      cmake .
+      make
+    '';
+    compile-protos.exec = ''
       python -m grpc.tools.protoc --python_out=./cattledb/grpcserver --grpc_python_out=./cattledb/grpcserver --proto_path=./protos cdb.proto
       sed -i "s/import cdb_pb2 as cdb__pb2/from . import cdb_pb2 as cdb__pb2/g" cattledb/grpcserver/cdb_pb2_grpc.py
     '';
