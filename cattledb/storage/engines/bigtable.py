@@ -212,10 +212,12 @@ class BigtableTable(StorageTable):
                 row.set_cell(column_family.encode("utf-8"), col.encode("utf-8"), value)
             rows.append(row)
         responses = self._low_level.mutate_rows(rows)
-        for r in responses:
-            if r.code != 0:
+        for response in responses:
+            if response.code != 0:
                 raise ValueError(
-                    "Bigtable upsert failed with: {} - {}".format(r.code, r.message)
+                    "Bigtable upsert failed with: {} - {}".format(
+                        response.code, response.message
+                    )
                 )
         return responses
 
