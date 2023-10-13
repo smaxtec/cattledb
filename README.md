@@ -12,10 +12,10 @@ CattleDB can be used as a library in projects or as a standalone service with a 
 
 ## Installation
 
-Recursive option is needed to build the C speedups.
+To use the development environment you have to have [Nix](https://nixos.org/download#download-nix) and [devenv](https://devenv.sh/) installed.
 
 ```sh
-git clone --recursive https://github.com:smaxtec/cattledb.git
+git clone https://github.com:smaxtec/cattledb.git
 devenv shell
 ```
 
@@ -28,9 +28,23 @@ run-cattledb-tests
 
 ## Compile Python protobuf files
 
+The files reside in the `protos` directory.
+
 ```sh
 devenv shell
-compile-protobuf-files
+compile-protos
+```
+
+The files reside in the `extensions` directory.
+They originate from the [cattledb-extensions repository](https://github.com/smaxtec/cattledb-extensions).
+
+## Compile C++ extensions
+
+The files reside in the `extensions` directory.
+
+```sh
+devenv shell
+compile-extensions
 ```
 
 ## Build cattledb container
@@ -38,14 +52,4 @@ compile-protobuf-files
 ```sh
 devenv shell
 build-cattledb-container
-```
-
-## Build container and run tests inside container manually
-
-```sh
-docker build . -t cattledb-test
-docker run -it cattledb-test
-service bigtable-server start
-export BIGTABLE_EMULATOR_HOST="localhost:8080"
-/app/.venv/bin/pytest tests -vv
 ```
