@@ -111,3 +111,9 @@ devenv.local.nix
 .pre-commit-config.yaml
 
 cattle.db
+
+# CMake and make files
+CMakeCache.txt
+cmake_install.cmake
+CMakeFiles/
+Makefile
